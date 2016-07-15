@@ -2,15 +2,11 @@
 void CalcRho(){
 
 	for ( ix = 0; ix < n_bins; ix++){
-		x = DeltaR*(ix+0.5);
-		if(x > H2) x = H -x;
 		for ( iy = 0; iy < n_bins; iy++){
-			y = DeltaR*(iy+0.5);
-            if(y > H2) y = H -y;
             for ( iz = 0; iz < n_bins; iz++){
                 z = DeltaR*(iz+0.5);
                 if(z > H2) z = H - z;
-                if( x <= RII || y <= RII || z <= RT ) rho.real[(ix*n_bins+iy)*n_bins+iz] = 0;
+                if( z <= RT ) rho.real[(ix*n_bins+iy)*n_bins+iz] = 0;
                 else rho.real[(ix*n_bins+iy)*n_bins+iz] = bulk;
             }
 		}
@@ -42,7 +38,7 @@ void CalcW0(){
             fftw_execute(wr2f); 
          
             for ( iz = 0; iz < n_bins; iz++){
-                w0.fourier[(ix*n_bins+iy)*n_bins+iz] = DeltaR*DeltaR*DeltaR*inv_n*inv_n*inv_n*wfourier[iz];
+                w0.fourier[(ix*n_bins+iy)*n_bins+iz] = DeltaR*inv_n*wfourier[iz];
             }
         }
     }
@@ -51,6 +47,14 @@ void CalcW0(){
 }
 
 void CalcW1(){
+            
+    for ( ix = 0; ix < n_bins; ix++){
+        for ( iy = 0; iy < n_bins; iy++){
+            for ( iz = 0; iz < n_bins; iz++){
+                w1[i].fourier[(ix*n_bins+iy)*n_bins+iz] = 0;
+            }
+        }
+    }
 
     for ( i = 0; i <= lmax; i++){
         params.l = i;
@@ -78,7 +82,7 @@ void CalcW1(){
                     fftw_execute(wr2f); 
                  
                     for ( iz = 0; iz < n_bins; iz++){
-                        w1[i][j].fourier[(ix*n_bins+iy)*n_bins+iz] = DeltaR*DeltaR*DeltaR*inv_n*inv_n*inv_n*wfourier[iz];
+                        w1[i].fourier[(ix*n_bins+iy)*n_bins+iz] += WignerdInt(l,0,params.m)*DeltaR*inv_n*wfourier[iz];
                     }
                 }
             }
@@ -88,6 +92,14 @@ void CalcW1(){
 }
 
 void CalcW2(){
+
+    for ( ix = 0; ix < n_bins; ix++){
+        for ( iy = 0; iy < n_bins; iy++){
+            for ( iz = 0; iz < n_bins; iz++){
+                w2[i].fourier[(ix*n_bins+iy)*n_bins+iz] = 0;
+            }
+        }
+    }
 
     for ( i = 0; i <= lmax; i++){
         params.l = i;
@@ -116,7 +128,7 @@ void CalcW2(){
                     fftw_execute(wr2f); 
                  
                     for ( iz = 0; iz < n_bins; iz++){
-                        w2[i][j].fourier[(ix*n_bins+iy)*n_bins+iz] = DeltaR*DeltaR*DeltaR*inv_n*inv_n*inv_n*wfourier[iz];
+                        w2[i].fourier[(ix*n_bins+iy)*n_bins+iz] += WignerdInt(l,0,params.m)*DeltaR*inv_n*wfourier[iz];
                     }
                 }
             }
@@ -152,7 +164,7 @@ void CalcW3(){
             fftw_execute(wr2f); 
          
             for ( iz = 0; iz < n_bins; iz++){
-                w3.fourier[(ix*n_bins+iy)*n_bins+iz] = DeltaR*DeltaR*DeltaR*inv_n*inv_n*inv_n*wfourier[iz];
+                w3.fourier[(ix*n_bins+iy)*n_bins+iz] = DeltaR*inv_n*wfourier[iz];
        //         fprintf (o1File, "%f %i %.10f\n", sqrt(ix*ix+iy*iy), iz, wfourier[iz]);
                 //std::cout << DeltaR*(ix+0.5) << " " << DeltaR*(iy+0.5) << " " << DeltaR*(iz+0.5) << " " << creal(w3.fourier[(ix*n_bins+iy)*n_bins+iz]) << " " << cimag(w3.fourier[(ix*n_bins+iy)*n_bins+iz]) << std::endl;
             }
@@ -172,10 +184,8 @@ void CalcN(){
             for( iz = 0; iz < n_bins; iz++){
                 n0.fourier[(ix*n_bins+iy)*n_bins+iz] = rho.fourier[(ix*n_bins+iy)*n_bins+iz]*w0.fourier[(ix*n_bins+iy)*n_bins+iz];
                 for ( i = 0; i <= lmax; i++){
-                    for( j = 0; j<=2*i; j++){
-                        n1[i][j].fourier[(ix*n_bins+iy)*n_bins+iz] = rho.fourier[(ix*n_bins+iy)*n_bins+iz]*w1[i][j].fourier[(ix*n_bins+iy)*n_bins+iz];
-                        n2[i][j].fourier[(ix*n_bins+iy)*n_bins+iz] = rho.fourier[(ix*n_bins+iy)*n_bins+iz]*w2[i][j].fourier[(ix*n_bins+iy)*n_bins+iz];
-                    }
+                    n1[i].fourier[(ix*n_bins+iy)*n_bins+iz] = rho.fourier[(ix*n_bins+iy)*n_bins+iz]*w1[i].fourier[(ix*n_bins+iy)*n_bins+iz];
+                    n2[i].fourier[(ix*n_bins+iy)*n_bins+iz] = rho.fourier[(ix*n_bins+iy)*n_bins+iz]*w2[i].fourier[(ix*n_bins+iy)*n_bins+iz];
                 }
                 n3.fourier[(ix*n_bins+iy)*n_bins+iz] = rho.fourier[(ix*n_bins+iy)*n_bins+iz]*w3.fourier[(ix*n_bins+iy)*n_bins+iz];
             }
@@ -184,13 +194,12 @@ void CalcN(){
     
     n0.invfft();
     for ( i = 0; i <= lmax; i++){
-        for( j = 0; j<=2*i; j++){
-        n1[i][j].invfft();
-        n2[i][j].invfft();
-        }
+        n1[i].invfft();
+        n2[i].invfft();
     }
     n3.invfft();
 }
+
 
 void CalcPHI(){
 
@@ -204,10 +213,8 @@ void CalcPHI(){
                 Phi3();
                
                 for ( i = 0; i <= lmax; i++){
-                    for( j = -i; j<=i; j++){
-                        Phi1();
-                        Phi2();
-                    }
+                    Phi1();
+                    Phi2();
                 }
             }
         }
@@ -215,10 +222,8 @@ void CalcPHI(){
 
     PHI0.fft();
     for ( i = 0; i <= lmax; i++){
-        for( j = 0; j<=2*i; j++){
-            PHI1[i][j].fft();
-            PHI2[i][j].fft();
-        }
+        PHI1[i].fft();
+        PHI2[i].fft();
     }
     PHI3.fft();
 }
@@ -230,10 +235,8 @@ void CalcSC(){
             for( iz = 0; iz < n_bins; iz++){
                 sc0.fourier[(ix*n_bins+iy)*n_bins+iz] =  PHI0.fourier[(ix*n_bins+iy)*n_bins+iz]*w0.fourier[(ix*n_bins+iy)*n_bins+iz];
                 for ( i = 0; i <= lmax; i++){
-                    for( j = 0; j<=2*i; j++){
-                        sc1[i][j].fourier[(ix*n_bins+iy)*n_bins+iz] =  -PHI1[i][j].fourier[(ix*n_bins+iy)*n_bins+iz]*w1[i][j].fourier[(ix*n_bins+iy)*n_bins+iz];
-                        sc2[i][j].fourier[(ix*n_bins+iy)*n_bins+iz] =  -PHI2[i][j].fourier[(ix*n_bins+iy)*n_bins+iz]*w2[i][j].fourier[(ix*n_bins+iy)*n_bins+iz];
-                    }
+                    sc1[i].fourier[(ix*n_bins+iy)*n_bins+iz] =  -PHI1[i].fourier[(ix*n_bins+iy)*n_bins+iz]*w1[i].fourier[(ix*n_bins+iy)*n_bins+iz];
+                    sc2[i].fourier[(ix*n_bins+iy)*n_bins+iz] =  -PHI2[i].fourier[(ix*n_bins+iy)*n_bins+iz]*w2[i].fourier[(ix*n_bins+iy)*n_bins+iz];
                 }
                 sc3.fourier[(ix*n_bins+iy)*n_bins+iz] =  PHI3.fourier[(ix*n_bins+iy)*n_bins+iz]*w3.fourier[(ix*n_bins+iy)*n_bins+iz];
             }
@@ -242,10 +245,8 @@ void CalcSC(){
 
     sc0.invfft();
     for ( i = 0; i <= lmax; i++){
-        for( j = 0; j<=2*i; j++){
-            sc1[i][j].invfft();
-            sc2[i][j].invfft();
-        }
+        sc1[i].invfft();
+        sc2[i].invfft();
     }
     sc3.invfft();
 }
@@ -258,10 +259,8 @@ void CalcC(){
                 c1.real[(ix*n_bins+iy)*n_bins+iz] = 0;
                 c1.real[(ix*n_bins+iy)*n_bins+iz] -= sc0.real[(ix*n_bins+iy)*n_bins+iz];
                 for ( i = 0; i <= lmax; i++){
-                    for( j = 0; j<=2*i; j++){
-                        c1.real[(ix*n_bins+iy)*n_bins+iz] -= sc1[i][j].real[(ix*n_bins+iy)*n_bins+iz];
-                        c1.real[(ix*n_bins+iy)*n_bins+iz] -= sc2[i][j].real[(ix*n_bins+iy)*n_bins+iz];
-                    }
+                    c1.real[(ix*n_bins+iy)*n_bins+iz] -= sc1[i].real[(ix*n_bins+iy)*n_bins+iz];
+                    c1.real[(ix*n_bins+iy)*n_bins+iz] -= sc2[i].real[(ix*n_bins+iy)*n_bins+iz];
                 }
                 c1.real[(ix*n_bins+iy)*n_bins+iz] -= sc3.real[(ix*n_bins+iy)*n_bins+iz];
             }

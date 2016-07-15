@@ -28,17 +28,14 @@ void Setup(){
 
     for( i = 0; i <= lmax ; i++){
         std::string is = toString(i); 
-        for( j = 0; j<=2*i; j++){
-            std::string js = toString(j-i); 
-            w1[i][j].setup(n_bins,"w1_" + is + "_" + js + ".dat");
-            w2[i][j].setup(n_bins,"w2_" + is + "_" + js + ".dat");
-            n1[i][j].setup(n_bins,"n1_" + is + "_" + js + ".dat");
-            n2[i][j].setup(n_bins,"n2_" + is + "_" + js + ".dat");
-            PHI1[i][j].setup(n_bins,"PHI1_" + is + "_" + js + ".dat");
-            PHI2[i][j].setup(n_bins,"PHI2_" + is + "_" + js + ".dat");
-            sc1[i][j].setup(n_bins,"sc1_" + is + "_" + js + ".dat");
-            sc2[i][j].setup(n_bins,"sc2_" + is + "_" + js + ".dat");
-        }
+        w1[i].setup(n_bins,"w1_" + is + ".dat");
+        w2[i].setup(n_bins,"w2_" + is + ".dat");
+        n1[i].setup(n_bins,"n1_" + is + ".dat");
+        n2[i].setup(n_bins,"n2_" + is + ".dat");
+        PHI1[i].setup(n_bins,"PHI1_" + is + ".dat");
+        PHI2[i].setup(n_bins,"PHI2_" + is + ".dat");
+        sc1[i].setup(n_bins,"sc1_" + is + ".dat");
+        sc2[i].setup(n_bins,"sc2_" + is + ".dat");
     }
     
     wreal = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * n_bins);

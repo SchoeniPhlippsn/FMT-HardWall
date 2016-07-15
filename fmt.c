@@ -27,7 +27,7 @@ int main (){
 	RT = 1.5*sqrt(0.5);
 
 	DeltaR = H*inv_n;
-	DeltaK = inv_n*2*M_PI/RII;
+	DeltaK = inv_n*DeltaR*2*M_PI/RII;
 
 	bulk = 0.3*H*H*H/((H-2*RII)*(H-2*RII)*(H-2*RT)*4*M_PI*RII*RII*RII);
 
@@ -51,18 +51,18 @@ int main (){
        // if(st==0) rho.print(n_bins,DeltaR);
 
         CalcN();
-    
-   /*     if(st==0){		
+   /* 
+        if(st==0){		
             n0.print(n_bins,DeltaR); 
             n12.print(n_bins,DeltaR); 
             n222.print(n_bins,DeltaR); 
             n3.print(n_bins,DeltaR); 
-        }
-    */
+        }*/
+    
         CalcPHI();
 
-    
-      /*  if(st==0){		
+    /*
+        if(st==0){		
             PHI0.print(n_bins,DeltaR); 
             PHI12.print(n_bins,DeltaR); 
             PHI222.print(n_bins,DeltaR); 
@@ -71,14 +71,14 @@ int main (){
 
         CalcSC();
 
-
-        /*if(st==0){		
+/*
+        if(st==0){		
             sc0.print(n_bins,DeltaR); 
             sc12.print(n_bins,DeltaR); 
             sc222.print(n_bins,DeltaR); 
             sc3.print(n_bins,DeltaR); 
-        }*/
-
+        }
+*/
         CalcC();
 
        // if(st==0) c1.print(n_bins,DeltaR); 
@@ -115,7 +115,7 @@ int main (){
             }
 		}
     }    
-   
+
 	FILE * oFile;
 	FILE * oFile1;
 

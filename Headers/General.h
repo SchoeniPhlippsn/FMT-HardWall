@@ -10,8 +10,8 @@
 
 //WeightDensities
     class weight w0;
-    class weight w1[lmax+1][2*lmax+1];
-    class weight w2[lmax+1][2*lmax+1];
+    class weight w1[lmax+1];
+    class weight w2[lmax+1];
 	class weight w12;
 	class weight w222;
 	class weight w3;
@@ -19,20 +19,20 @@
 	class weight rho;
 	class weight rho_n;
 	class weight n0;
-    class weight n1[lmax+1][2*lmax+1];
-    class weight n2[lmax+1][2*lmax+1];
+    class weight n1[lmax+1];
+    class weight n2[lmax+1];
 	//class weight n12;
 	//class weight n222;
     class weight n3;
 	class weight PHI0;
-    class weight PHI1[lmax+1][2*lmax+1];
-    class weight PHI2[lmax+1][2*lmax+1];
+    class weight PHI1[lmax+1];
+    class weight PHI2[lmax+1];
 	//class weight PHI12;
 	//class weight PHI222;
 	class weight PHI3;
 	class weight sc0;
-    class weight sc1[lmax+1][2*lmax+1];
-    class weight sc2[lmax+1][2*lmax+1];
+    class weight sc1[lmax+1];
+    class weight sc2[lmax+1];
 	//class weight sc12;
 	//class weight sc222;
 	class weight sc3;
