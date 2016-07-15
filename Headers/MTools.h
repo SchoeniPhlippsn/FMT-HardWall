@@ -63,32 +63,20 @@ double Wignerd(double theta, int l, int m, int n){
 double WignerdInt(int l, int m, int n){
     double d=0;
     int i,j,k;
-    int sgn = -1;
     if(abs(m+n) % 2 == 0){
         i = getNumber(l,m,0);
         j = getNumber(l,0,n);
 
         d += WList[i]*WList[j]*M_PI;
-
-        for(k=1; k <= l; k++){
-               i = getNumber(l,m,k);
-               j = getNumber(l,k,n);
-
-               d += 2*sgn*WList[i]*WList[j]*sin(k*M_PI)/k;
-               sgn *= -1;
-        } 
         
         if(abs(m+n)/2 % 2 == 1) d *= -1;
 
     }else{
-        sgn = 1;
-        for(k=1; k <= l; k++){
+        for(k=1; k <= l; k+=2){
                i = getNumber(l,m,k);
                j = getNumber(l,k,n);
 
-               d += 2*sgn*WList[i]*WList[j]*cos(k*M_PI)/k;
-               d -= 2*sgn*WList[i]*WList[j]/k;
-               sgn *= -1;
+               d -= 4*WList[i]*WList[j]/k;
         } 
 
         if(abs(m+n+1)/2 % 2 == 1) d *= -1;

@@ -20,7 +20,7 @@ int main (){
 	n_bins_2 = n_bins/2;
 	inv_n = 1./n_bins;
 
-	H = 7;
+	H = 10;
 	H2 = H/2;
 	
 	RII = 0.5*sqrt(0.5);
