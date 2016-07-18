@@ -16,18 +16,20 @@
 
 int main (){
 
-	n_bins = 64;
+	n_bins = 128;
 	n_bins_2 = n_bins/2;
 	inv_n = 1./n_bins;
 
-	H = 10;
+	H = 5;
 	H2 = H/2;
 	
 	RII = 0.5*sqrt(0.5);
 	RT = 1.5*sqrt(0.5);
 
 	DeltaR = H*inv_n;
-	DeltaK = inv_n*DeltaR*2*M_PI/RII;
+	DeltaK = inv_n*2*M_PI/DeltaR;
+
+    inv_nDeltaR = inv_n*DeltaR*inv_n*DeltaR*inv_n*DeltaR;
 
 	bulk = 0.3*H*H*H/((H-2*RII)*(H-2*RII)*(H-2*RT)*4*M_PI*RII*RII*RII);
 
@@ -44,15 +46,29 @@ int main (){
     CalcW1();
     CalcW2();
     CalcW3();
-    
+            
+    /*w0.print(n_bins,DeltaR); 
+    w1[0].print(n_bins,DeltaR); 
+    w1[1].print(n_bins,DeltaR); 
+    w1[2].print(n_bins,DeltaR); 
+    w1[3].print(n_bins,DeltaR); 
+    w1[4].print(n_bins,DeltaR); 
+    w2[0].print(n_bins,DeltaR); 
+    w2[1].print(n_bins,DeltaR); 
+    w2[2].print(n_bins,DeltaR); 
+    w2[3].print(n_bins,DeltaR); 
+    w2[4].print(n_bins,DeltaR); 
+    w3.invfft();
+    w3.print(n_bins,DeltaR);*/
+
     for( st = 0 ; st <= 1000; st++){
 
         rho.fft();
        // if(st==0) rho.print(n_bins,DeltaR);
 
         CalcN();
-   /* 
-        if(st==0){		
+    
+        /*if(st==0){		
             n0.print(n_bins,DeltaR); 
             n12.print(n_bins,DeltaR); 
             n222.print(n_bins,DeltaR); 

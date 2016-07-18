@@ -11,6 +11,7 @@ void CalcRho(){
             }
 		}
 	}
+    std::cout << "Calculated:  Rho" << std::endl;
 }
 
 
@@ -38,7 +39,7 @@ void CalcW0(){
             fftw_execute(wr2f); 
          
             for ( iz = 0; iz < n_bins; iz++){
-                w0.fourier[(ix*n_bins+iy)*n_bins+iz] = DeltaR*inv_n*wfourier[iz];
+                w0.fourier[(ix*n_bins+iy)*n_bins+iz] = inv_nDeltaR*wfourier[iz];
             }
         }
     }
@@ -51,11 +52,13 @@ void CalcW1(){
     for ( ix = 0; ix < n_bins; ix++){
         for ( iy = 0; iy < n_bins; iy++){
             for ( iz = 0; iz < n_bins; iz++){
-                w1[i].fourier[(ix*n_bins+iy)*n_bins+iz] = 0;
+                for ( i = 0; i <= lmax; i++){
+                    w1[i].fourier[(ix*n_bins+iy)*n_bins+iz] = 0;
+                }
             }
         }
     }
-
+    
     for ( i = 0; i <= lmax; i++){
         params.l = i;
         for( j = 0; j<=2*i; j++){
@@ -82,7 +85,7 @@ void CalcW1(){
                     fftw_execute(wr2f); 
                  
                     for ( iz = 0; iz < n_bins; iz++){
-                        w1[i].fourier[(ix*n_bins+iy)*n_bins+iz] += WignerdInt(l,0,params.m)*DeltaR*inv_n*wfourier[iz];
+                        w1[i].fourier[(ix*n_bins+iy)*n_bins+iz] += WignerdInt(l,0,params.m)*inv_nDeltaR*wfourier[iz];
                     }
                 }
             }
@@ -96,7 +99,9 @@ void CalcW2(){
     for ( ix = 0; ix < n_bins; ix++){
         for ( iy = 0; iy < n_bins; iy++){
             for ( iz = 0; iz < n_bins; iz++){
-                w2[i].fourier[(ix*n_bins+iy)*n_bins+iz] = 0;
+                for ( i = 0; i <= lmax; i++){
+                    w2[i].fourier[(ix*n_bins+iy)*n_bins+iz] = 0;
+                }
             }
         }
     }
@@ -128,7 +133,7 @@ void CalcW2(){
                     fftw_execute(wr2f); 
                  
                     for ( iz = 0; iz < n_bins; iz++){
-                        w2[i].fourier[(ix*n_bins+iy)*n_bins+iz] += WignerdInt(l,0,params.m)*DeltaR*inv_n*wfourier[iz];
+                        w2[i].fourier[(ix*n_bins+iy)*n_bins+iz] += WignerdInt(l,0,params.m)*inv_nDeltaR*wfourier[iz];
                     }
                 }
             }
@@ -164,7 +169,7 @@ void CalcW3(){
             fftw_execute(wr2f); 
          
             for ( iz = 0; iz < n_bins; iz++){
-                w3.fourier[(ix*n_bins+iy)*n_bins+iz] = DeltaR*inv_n*wfourier[iz];
+                w3.fourier[(ix*n_bins+iy)*n_bins+iz] = inv_nDeltaR*wfourier[iz];
        //         fprintf (o1File, "%f %i %.10f\n", sqrt(ix*ix+iy*iy), iz, wfourier[iz]);
                 //std::cout << DeltaR*(ix+0.5) << " " << DeltaR*(iy+0.5) << " " << DeltaR*(iz+0.5) << " " << creal(w3.fourier[(ix*n_bins+iy)*n_bins+iz]) << " " << cimag(w3.fourier[(ix*n_bins+iy)*n_bins+iz]) << std::endl;
             }

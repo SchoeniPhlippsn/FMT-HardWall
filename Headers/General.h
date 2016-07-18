@@ -3,7 +3,7 @@
     const int lmax = 4;
     const double kth = 3.8;
     const double asp = 3;
-    const double a1 = sqrt(2)*0.5;
+    const double a1 = sqrt(0.5)*0.5;
     const double a2 = a1*(kth-asp)/kth;
     const double a3 = a1*(kth+asp)/kth;
     const double b1 = 1.5*sqrt(0.5);
@@ -47,7 +47,7 @@
 	int n_bins, n_bins_2;
     double x, y, z, kx, ky, kz;
 	double inv_n, H, H2, RII, RT;
-    double DeltaR, DeltaK, bulk;
+    double DeltaR, DeltaK, bulk, inv_nDeltaR;
 	int i, j, ix, iy, iz, v, st;
     int l,m, l1, l2, l3, m1, m2, m3;
      

@@ -67,17 +67,26 @@ void weight::print (int n_bins, double Delta){
 
 	for( int ix =0; ix < n_bins; ix++){
 		double x = ix*Delta;
+        double xx;
+        if(ix < n_bins/2) xx = Delta*(ix+n_bins/2);
+        else xx = Delta*(ix-n_bins/2);
 
 		for( int iy =0; iy < n_bins; iy++){
 			double y = iy*Delta;
+            double yy;
+            if(iy < n_bins/2) yy = Delta*(iy+n_bins/2);
+            else yy = Delta*(iy-n_bins/2);
             
             fprintf (File, "%.18f %.18f %.18f %.18f\n", x+0.5*Delta, y+0.5*Delta, creal(real[(ix*n_bins + iy)*n_bins + n_bins/2]), cimag(real[(ix*n_bins + iy)*n_bins + n_bins/2]));
             fprintf (TFile, "%.18f %.18f %.18f %.18f\n", x, y, creal(fourier[(ix*n_bins + iy)*n_bins + n_bins/2]), cimag(fourier[(ix*n_bins + iy)*n_bins + n_bins/2]));
             
             for( int iz =0; iz < n_bins; iz++){
                 double z = iz*Delta;
+                double zz;
+                if(iz < n_bins/2) zz = Delta*(iz+n_bins/2);
+                else zz = Delta*(iz-n_bins/2);
 
-                fprintf (reFile, "%.18f %.18f %.18f %.18f %.18f\n", x+0.5*Delta, y+0.5*Delta, z+0.5*Delta, creal(real[(ix*n_bins + iy)*n_bins+iz]), cimag(real[(ix*n_bins + iy)*n_bins+iz]));
+                fprintf (reFile, "%.18f %.18f %.18f %.18f %.18f\n", xx, yy, zz, creal(real[(ix*n_bins + iy)*n_bins+iz]), cimag(real[(ix*n_bins + iy)*n_bins+iz]));
                 fprintf (ftFile, "%.18f %.18f %.18f %.18f %.18f\n", x, y, z, creal(fourier[(ix*n_bins + iy)*n_bins + iz]), cimag(fourier[(ix*n_bins + iy)*n_bins + iz]));
             }
         }

@@ -70,7 +70,8 @@ double w2func (double z, struct paras p) {
     if(z>0){ 
         double theta = getTheta(z,a1,a2,b);
         f = 2*M_PI*RR(z,a1,a2,b)*Wignerd(theta,l,m,0)*gsl_sf_bessel_Jn(m,kr*RR(z,a1,a2,b));
-    }else{
+    }else{ 
+        z *= -1;
         double theta = getTheta(z,a1,a3,b);
         f = 2*M_PI*RR(z,a1,a3,b)*Wignerd(theta,l,m,0)*gsl_sf_bessel_Jn(m,kr*RR(z,a1,a3,b));
     }
@@ -87,7 +88,10 @@ double w3func (double z, struct paras p) {
     
     double f;
     if(z>0) f = 2*M_PI*RR(z,a1,a2,b)*gsl_sf_bessel_J1(kr*RR(z,a1,a2,b));
-    else f = 2*M_PI*RR(z,a1,a3,b)*gsl_sf_bessel_J1(kr*RR(z,a1,a3,b));
-    
+    else{ 
+        z *= -1;
+        f = 2*M_PI*RR(z,a1,a3,b)*gsl_sf_bessel_J1(kr*RR(z,a1,a3,b));
+    }
+     
     return f/(b*kr);
 }
