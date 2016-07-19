@@ -108,7 +108,7 @@ double RR (double z, double a1, double a2, double b) {
 
 double getTheta( double z, double a1, double a2, double b) {
     double tt = t(z,b);
-    double nz = 3.0*(a1-a2)*(1-tt)*(1-tt) + 12.0*a2*tt*(1-tt) + 3.0*(a1-a2)*tt*tt;;
+    double nz = 3.0*(a1-a2)*(1-tt)*(1-tt) + 12.0*a2*tt*(1-tt) + 3.0*(a1-a2)*tt*tt;
     if ( a1 < a2 ) nz *= -1; 
    
     double nrho = 4*b*(1-2*tt);
