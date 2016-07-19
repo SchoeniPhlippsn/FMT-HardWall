@@ -50,18 +50,19 @@ void weight::print (int n_bins, double Delta){
 	FILE * File;
     std::string Name;
 	char file[20];
-	strcpy(file,Filename.c_str());
+    Name = "Results/" + Filename;
+	strcpy(file,Name.c_str());
 	reFile = fopen (file,"w");
     
-    Name = "T" + Filename;
+    Name = "Results/T" + Filename;
     strcpy(file,Name.c_str());
 	File = fopen (file,"w");
 	
-    Filename = "fft" + Filename;
-	strcpy(file,Filename.c_str());
+    Name = "Results/fft" + Filename;
+	strcpy(file,Name.c_str());
 	ftFile = fopen (file,"w");
     
-    Name = "T" + Filename;
+    Name = "Results/T" + Filename;
     strcpy(file,Name.c_str());
 	TFile = fopen (file,"w");
 

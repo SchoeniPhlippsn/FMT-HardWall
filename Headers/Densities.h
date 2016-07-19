@@ -32,7 +32,7 @@ double w1func (double z, struct paras p) {
         if(z>0){ 
             theta = getTheta(z,a1,a2,b);
             f = 0.5*RR(z,a1,a2,b)*Wignerd(theta,l,m,0)*gsl_sf_bessel_J0(kr*RR(z,a1,a2,b))*meanC(z,a1,a2,b);
-        else{
+        }else{
             z *= -1;
             theta = getTheta(z,a1,a3,b);
             f = 0.5*RR(z,a1,a3,b)*Wignerd(theta,l,m,0)*gsl_sf_bessel_Jn(m,kr*RR(z,a1,a3,b))*meanC(z,a1,a3,b);
@@ -42,7 +42,7 @@ double w1func (double z, struct paras p) {
         if(z>0){
             theta = getTheta(z,a1,a2,b);
             f = -0.5*RR(z,a1,a2,b)*Wignerd(theta,l,m,0)*gsl_sf_bessel_Jn(m,kr*RR(z,a1,a2,b))*meanC(z,a1,a2,b);
-        else{ 
+        }else{ 
             z *= -1;
             theta = getTheta(z,a1,a3,b);
             f = -0.5*RR(z,a1,a3,b)*Wignerd(theta,l,m,0)*gsl_sf_bessel_Jn(m,kr*RR(z,a1,a3,b))*meanC(z,a1,a3,b);

@@ -135,8 +135,8 @@ int main (){
 	FILE * oFile;
 	FILE * oFile1;
 
-	oFile = fopen ("rho_fin.dat","w");
-	oFile1 = fopen ("rho_fin0.dat","w");
+	oFile = fopen ("Results/rho_fin.dat","w");
+	oFile1 = fopen ("Results/rho_fin0.dat","w");
 
 	for( ix =0; ix < n_bins; ix++){
 		for( iy =0; iy < n_bins; iy++){
