@@ -57,10 +57,13 @@ int main (){
     CalcW3();
     
     w3.print(n_bins,DeltaR); 
-          
-    for( st = 0 ; st <= 10000; st++){
+         
+    st =0;
+    
+    now = 0;
+    prev = 1; 
+    while( fabs(prev-now) > 1e-6  ){
         for(j=0; j<= 100; j++) rho[j].fft();
-
 
         CalcN();
         
@@ -93,51 +96,30 @@ int main (){
             c1[20].print(n_bins,DeltaR); 
         } 
 
-        for(j=0; j<= 100; j++){
-            
-            rho_sum = 0;
-            
-            theta = DeltaK*j;
-
-            b2 = WallDistance(theta);
-            
-            theta = DeltaK*(100-j);
-            
-            b3 = WallDistance(theta);
-
-            for ( iz = 0; iz < n_bins; iz++){
-                z = DeltaR*(iz+0.5);
-                if(z <= H2){ 
-                    if( z <= b2 ) rhon[j].real[iz] = 0.;
-                    else rhon[j].real[iz] = exp(creal(c1[j].real[iz]));// + rho_sum[(ix]));
-                }else{
-                    z = H - z;
-                    if( z <= b3 ) rhon[j].real[iz] = 0.;
-                    else rhon[j].real[iz] = exp(creal(c1[j].real[iz]));// + rho_sum[(ix]));
-                }
-                rho_sum += creal(rhon[j].real[iz]);
-            }
-		
-            sclf = rho_sum_o/rho_sum;
-            if(st%1==0 && j== 100 ) printf("%i %f %f\n",st, rho_sum, sclf);
-
-            for( iz =0; iz < n_bins; iz++){
-                rhon[j].real[iz] *= sclf;
-                rho[j].real[iz] = rho[j].real[iz]*(1-alpha) + rhon[j].real[iz]*alpha;     
-            }
-        }
+        CalcRhoN();
+        st++;
     }    
     
-    FILE * oFile;
-    FILE * oFile2;
+    for( j=0; j <= 100; j++){
+        std::string js = toString(j); 
+        rho[j].Filename = "rho_fin" + js + ".dat"; 
+        rho[j].printReal(n_bins, DeltaR);
 
-    oFile = fopen ("Results/rho_fin80.dat","w");
-    oFile2 = fopen ("Results/rho_fin20.dat","w");
-
-
-    for( iz =0; iz < n_bins; iz++){
-        fprintf (oFile, "%f %f %f\n", DeltaR*(iz+0.5), creal(rho[80].real[iz]), cimag(rho[80].real[iz]));
-        fprintf (oFile2, "%f %f %f\n", DeltaR*(iz+0.5), creal(rho[20].real[iz]), cimag(rho[20].real[iz]));
+        theta = j*DeltaK;
+        
+        printf("%f %f\n",theta,WallDistance(theta));
     }
-    
+   
+    for( iz = 0; iz < n_bins; iz++){
+        rho[0].real[iz] = 0.5*(rho[0].real[iz]+rho[100].real[iz]);
+
+        for ( j = 1; j < 100; j++){
+            rho[0].real[iz] += rho[j].real[iz];
+            rho[0].real[iz] += rho[j].real[iz];
+        }
+        rho[0].real[iz] *= DeltaK;
+    }
+    rho[0].Filename = "rho_fin.dat";
+    rho[0].printReal(n_bins, DeltaR);
+
 }

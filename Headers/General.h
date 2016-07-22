@@ -39,6 +39,7 @@
     double DeltaR, DeltaK, bulk, inv_nDeltaR;
 	int i, j, iz, v, st;
     int l,m, l1, l2, l3, m1, m2, m3;
+    double prev, now;
      
 //Varaibles Calc.h    
     double real, imag, omega;

@@ -10,6 +10,7 @@ class weight {
 		void setup (int,std::string);
 		void kill_plan ();
 		void print (int, double);
+		void printReal (int, double);
 		void fft (){fftw_execute(r2f);};
 		void invfft (){fftw_execute(f2r);};
 		void copy_real(const weight *,int);
@@ -42,8 +43,6 @@ void weight::copy_real(const weight *w,int n_bins){
 void weight::print (int n_bins, double Delta){
 	FILE * reFile;
 	FILE * ftFile;
-	FILE * TFile;
-	FILE * File;
     std::string Name;
 	char file[30];
     Name = "Results/" + Filename;
@@ -58,5 +57,20 @@ void weight::print (int n_bins, double Delta){
         double z = iz*Delta;
         fprintf (reFile, "%.18f %.18f %.18f\n", z, creal(real[iz]), cimag(real[iz]));
         fprintf (ftFile, "%.18f %.18f %.18f\n", z, creal(fourier[iz]), cimag(fourier[iz]));
+    }
+}
+
+void weight::printReal (int n_bins, double Delta){
+	FILE * reFile;
+	FILE * ftFile;
+    std::string Name;
+	char file[30];
+    Name = "Results/" + Filename;
+	strcpy(file,Name.c_str());
+	reFile = fopen (file,"w");
+    
+    for( int iz =0; iz < n_bins; iz++){
+        double z = iz*Delta;
+        fprintf (reFile, "%.18f %.18f %.18f\n", z, creal(real[iz]), cimag(real[iz]));
     }
 }
