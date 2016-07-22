@@ -60,31 +60,6 @@ double Wignerd(double theta, int l, int m, int n){
     return d;   
 } 
 
-double WignerdInt(int l, int m, int n){
-    double d=0;
-    int i,j,k;
-    if(abs(m+n) % 2 == 0){
-        i = getNumber(l,m,0);
-        j = getNumber(l,0,n);
-
-        d += WList[i]*WList[j]*M_PI;
-        
-        if(abs(m+n)/2 % 2 == 1) d *= -1;
-
-    }else{
-        for(k=1; k <= l; k+=2){
-               i = getNumber(l,m,k);
-               j = getNumber(l,k,n);
-
-               d -= 4*WList[i]*WList[j]/k;
-        } 
-
-        if(abs(m+n+1)/2 % 2 == 1) d *= -1;
-    }
-    
-    return d;   
-} 
-
 double SHN(int l, int m){
    
     int l_m = factorial(l-m);
@@ -100,10 +75,23 @@ double t (double z, double b){
     return tt;
 }
 
+double tAbl (double z, double b){
+    double tt = 0.25/(b*sqrt(1-z/b));
+    return tt;
+}
+
 double RR (double z, double a1, double a2, double b) {   
     double tt = t(z,b);
     double rr = a1*(1-tt)*(1-tt)*(1-tt) + 3*a2*(1-tt)*(1-tt)*tt - 3*a2*(1-tt)*tt*tt - a1*tt*tt*tt;
     return rr;
+}
+
+double RRAbl2 (double z, double a1, double a2, double b) {   
+    double term1 = (a1*b-0.25*a1*z+0.75*a2*z)/(b*b*b);
+    double term2 = b*b*b*b - b*b*b*z;
+    double term3 = -0.75*a1*b+0.75*a2*b+0.375*a1*z-1.125*a2*z;
+    term2 += term3*term3;
+    return term1*sqrt(term2);
 }
 
 double getTheta( double z, double a1, double a2, double b) {

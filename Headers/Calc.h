@@ -1,199 +1,152 @@
 
 void CalcRho(){
-
-	for ( ix = 0; ix < n_bins; ix++){
-		for ( iy = 0; iy < n_bins; iy++){
-            for ( iz = 0; iz < n_bins; iz++){
-                z = DeltaR*(iz+0.5);
-                if(z > H2) z = H - z;
-                if( z <= RT ) rho.real[(ix*n_bins+iy)*n_bins+iz] = 0;
-                else rho.real[(ix*n_bins+iy)*n_bins+iz] = bulk;
-            }
-		}
-	}
+    
+    for(j=0; j<= 100; j++){
+        for ( iz = 0; iz < n_bins; iz++){
+            z = DeltaR*(iz+0.5);
+            if(z > H2) z = H - z;
+            if( z <= RII ) rho[j].real[iz] = 0;
+            else rho[j].real[iz] = bulk;
+        }
+    }
     std::cout << "Calculated:  Rho" << std::endl;
 }
 
 
 void CalcW0(){
 
-	for ( ix = 0; ix < n_bins; ix++){
-        if(ix < n_bins_2) kx = DeltaK*(ix+0.5);
-		else kx = DeltaK*(ix-n_bins+0.5);
+    for ( iz = 0; iz < n_bins; iz++){
+                
+        if(iz < n_bins_2) kz = DeltaR*(iz+0.5);
+        else kz = DeltaR*(iz-n_bins+0.5);
 
-		for ( iy = 0; iy < n_bins; iy++){
-            if(iy < n_bins_2) ky = DeltaK*(iy+0.5);
-            else ky = DeltaK*(iy-n_bins+0.5);
-           
-            params.kr = sqrt(kx*kx+ky*ky); 
+        if(fabs(kz) < b1) w0.real[iz]= w0func(kz,params);
+        else w0.real[iz]= 0;
+    }
 
+    w0.fft();
+ 
+    for ( iz = 0; iz < n_bins; iz++){
+        w0.fourier[iz] *= inv_nDeltaR;
+    }
+
+    std::cout << "             W0" << std::endl;
+}
+
+
+void CalcW1(){
+            
+    for ( j = 0; j <= 100; j++){
+        theta = DeltaK*j;
+        for ( i = 0; i <= lmax; i++){
+            params.l = i;
             for ( iz = 0; iz < n_bins; iz++){
                 
                 if(iz < n_bins_2) kz = DeltaR*(iz+0.5);
                 else kz = DeltaR*(iz-n_bins+0.5);
-
-                if(fabs(kz) < b1) wreal[iz]= w0func(kz,params);
-                else wreal[iz]= 0;
+                w1[i][j].real[iz] = 0;
+                if(fabs(kz) < b1){
+                    for( v = 0; v<=2*i; v++){
+                        params.m = v-i;
+                        
+                        w1[i][j].real[iz] += Wignerd(theta, i ,0, params.m)*w1func(kz,params);
+                        
+                    }
+                }
             }
 
-            fftw_execute(wr2f); 
+            w1[i][j].fft(); 
          
             for ( iz = 0; iz < n_bins; iz++){
-                w0.fourier[(ix*n_bins+iy)*n_bins+iz] = inv_nDeltaR*wfourier[iz];
+                w1[i][j].fourier[iz] *= inv_nDeltaR;
             }
         }
     }
+    std::cout << "             W1" << std::endl;
+}    
 
-    std::cout << "Calculated:  W0" << std::endl;
-}
-
-void CalcW1(){
-            
-    for ( ix = 0; ix < n_bins; ix++){
-        for ( iy = 0; iy < n_bins; iy++){
-            for ( iz = 0; iz < n_bins; iz++){
-                for ( i = 0; i <= lmax; i++){
-                    w1[i].fourier[(ix*n_bins+iy)*n_bins+iz] = 0;
-                }
-            }
-        }
-    }
-    
-    for ( i = 0; i <= lmax; i++){
-        params.l = i;
-        for( j = 0; j<=2*i; j++){
-            params.m = j-i;
-            for ( ix = 0; ix < n_bins; ix++){
-                if(ix < n_bins_2) kx = DeltaK*(ix+0.5);
-                else kx = DeltaK*(ix-n_bins+0.5);
-
-                for ( iy = 0; iy < n_bins; iy++){
-                    if(iy < n_bins_2) ky = DeltaK*(iy+0.5);
-                    else ky = DeltaK*(iy-n_bins+0.5);
-                   
-                    params.kr = sqrt(kx*kx+ky*ky); 
-
-                    for ( iz = 0; iz < n_bins; iz++){
-                        
-                        if(iz < n_bins_2) kz = DeltaR*(iz+0.5);
-                        else kz = DeltaR*(iz-n_bins+0.5);
-
-                        if(fabs(kz) < b1) wreal[iz]= w1func(kz,params);
-                        else wreal[iz]= 0;
-                    }
-
-                    fftw_execute(wr2f); 
-                 
-                    for ( iz = 0; iz < n_bins; iz++){
-                        w1[i].fourier[(ix*n_bins+iy)*n_bins+iz] += WignerdInt(l,0,params.m)*inv_nDeltaR*wfourier[iz];
-                    }
-                }
-            }
-            std::cout << "             W1^" << params.l << "_" << params.m << std::endl;
-        }
-    }
-}
 
 void CalcW2(){
-
-    for ( ix = 0; ix < n_bins; ix++){
-        for ( iy = 0; iy < n_bins; iy++){
+    
+    for ( j = 0; j <= 100; j++){
+        theta = DeltaK*j;
+        for ( i = 0; i <= lmax; i++){
+            params.l = i;
             for ( iz = 0; iz < n_bins; iz++){
-                for ( i = 0; i <= lmax; i++){
-                    w2[i].fourier[(ix*n_bins+iy)*n_bins+iz] = 0;
-                }
-            }
-        }
-    }
-
-    for ( i = 0; i <= lmax; i++){
-        params.l = i;
-        for( j = 0; j<=2*i; j++){
-            params.m = j-i;
-            for ( ix = 0; ix < n_bins; ix++){
-                if(ix < n_bins_2) kx = DeltaK*(ix+0.5);
-                else kx = DeltaK*(ix-n_bins+0.5);
-
-                for ( iy = 0; iy < n_bins; iy++){
-                    if(iy < n_bins_2) ky = DeltaK*(iy+0.5);
-                    else ky = DeltaK*(iy-n_bins+0.5);
-                   
-                    params.kr = sqrt(kx*kx+ky*ky); 
-
-                    for ( iz = 0; iz < n_bins; iz++){
+                
+                if(iz < n_bins_2) kz = DeltaR*(iz+0.5);
+                else kz = DeltaR*(iz-n_bins+0.5);
+                w2[i][j].real[iz] = 0;
+                if(fabs(kz) < b1){
+                    for( v = 0; v<=2*i; v++){
+                        params.m = v-i;
                         
-                        if(iz < n_bins_2) kz = DeltaR*(iz+0.5);
-                        else kz = DeltaR*(iz-n_bins+0.5);
-
-                        if(fabs(kz) < b1) wreal[iz]= w2func(kz,params);
-                        else wreal[iz]= 0;
-                        
-                    }
-
-                    fftw_execute(wr2f); 
-                 
-                    for ( iz = 0; iz < n_bins; iz++){
-                        w2[i].fourier[(ix*n_bins+iy)*n_bins+iz] += WignerdInt(l,0,params.m)*inv_nDeltaR*wfourier[iz];
+                        w2[i][j].real[iz] += Wignerd(theta, params.l ,0, params.m)*w2func(kz,params);
                     }
                 }
             }
-            std::cout << "             W2^" << params.l << "_" << params.m << std::endl;
+
+            w2[i][j].fft(); 
+         
+            for ( iz = 0; iz < n_bins; iz++){
+                w2[i][j].fourier[iz] *= inv_nDeltaR;
+            }
         }
     }
+    std::cout << "             W2" << std::endl;
 }
 
 void CalcW3(){
 
-   // FILE * o1File;
-   // o1File = fopen ("Realfftw3.dat","w");
+    for ( iz = 0; iz < n_bins; iz++){
+        
+        if(iz < n_bins_2) kz = DeltaR*(iz+0.5);
+        else kz = DeltaR*(iz-n_bins+0.5);
 
-	for ( ix = 0; ix < n_bins; ix++){
-        if(ix < n_bins_2) kx = DeltaK*(ix+0.5);
-		else kx = DeltaK*(ix-n_bins+0.5);
-
-		for ( iy = 0; iy < n_bins; iy++){
-            if(iy < n_bins_2) ky = DeltaK*(iy+0.5);
-            else ky = DeltaK*(iy-n_bins+0.5);
-           
-            params.kr = sqrt(kx*kx+ky*ky); 
-
-            for ( iz = 0; iz < n_bins; iz++){
-                
-                if(iz < n_bins_2) kz = DeltaR*(iz+0.5);
-                else kz = DeltaR*(iz-n_bins+0.5);
-
-                if(fabs(kz) < b1) wreal[iz]= w3func(kz,params);
-                else wreal[iz]= 0;
-            }
-
-            fftw_execute(wr2f); 
-         
-            for ( iz = 0; iz < n_bins; iz++){
-                w3.fourier[(ix*n_bins+iy)*n_bins+iz] = inv_nDeltaR*wfourier[iz];
-       //         fprintf (o1File, "%f %i %.10f\n", sqrt(ix*ix+iy*iy), iz, wfourier[iz]);
-                //std::cout << DeltaR*(ix+0.5) << " " << DeltaR*(iy+0.5) << " " << DeltaR*(iz+0.5) << " " << creal(w3.fourier[(ix*n_bins+iy)*n_bins+iz]) << " " << cimag(w3.fourier[(ix*n_bins+iy)*n_bins+iz]) << std::endl;
-            }
-        }
+        if(fabs(kz) < b1) w3.real[iz]= w3func(kz,params);
+        else w3.real[iz]= 0;
     }
-    
+
+    w3.fft(); 
+ 
+    for ( iz = 0; iz < n_bins; iz++){
+        w3.fourier[iz] *= inv_nDeltaR;
+    }
     std::cout << "             W3" << std::endl;
-    
-    gsl_integration_workspace_free (w);
-    gsl_integration_qawo_table_free (table);
 }
+
 
 void CalcN(){
 
-    for( ix = 0; ix < n_bins; ix++){
-        for( iy = 0; iy < n_bins; iy++){
-            for( iz = 0; iz < n_bins; iz++){
-                n0.fourier[(ix*n_bins+iy)*n_bins+iz] = rho.fourier[(ix*n_bins+iy)*n_bins+iz]*w0.fourier[(ix*n_bins+iy)*n_bins+iz];
-                for ( i = 0; i <= lmax; i++){
-                    n1[i].fourier[(ix*n_bins+iy)*n_bins+iz] = rho.fourier[(ix*n_bins+iy)*n_bins+iz]*w1[i].fourier[(ix*n_bins+iy)*n_bins+iz];
-                    n2[i].fourier[(ix*n_bins+iy)*n_bins+iz] = rho.fourier[(ix*n_bins+iy)*n_bins+iz]*w2[i].fourier[(ix*n_bins+iy)*n_bins+iz];
-                }
-                n3.fourier[(ix*n_bins+iy)*n_bins+iz] = rho.fourier[(ix*n_bins+iy)*n_bins+iz]*w3.fourier[(ix*n_bins+iy)*n_bins+iz];
+    for( iz = 0; iz < n_bins; iz++){
+        n0.fourier[iz] = 0;
+        n3.fourier[iz] = 0;
+        for ( j = 1; j < 100; j++){
+            n0.fourier[iz] += rho[j].fourier[iz]*w0.fourier[iz];
+            n3.fourier[iz] += rho[j].fourier[iz]*w3.fourier[iz];
+        }
+        n0.fourier[iz] += 0.5*rho[0].fourier[iz]*w0.fourier[iz];
+        n3.fourier[iz] += 0.5*rho[0].fourier[iz]*w3.fourier[iz];
+        n0.fourier[iz] += 0.5*rho[100].fourier[iz]*w0.fourier[iz];
+        n3.fourier[iz] += 0.5*rho[100].fourier[iz]*w3.fourier[iz];
+
+        n0.fourier[iz] *= DeltaK;
+        n3.fourier[iz] *= DeltaK;
+        
+        for ( i = 0; i <= lmax; i++){
+            n1[i].fourier[iz] = 0;
+            n2[i].fourier[iz] = 0;
+            for ( j = 1; j < 100; j++){
+                n1[i].fourier[iz] += rho[j].fourier[iz]*w1[i][j].fourier[iz];
+                n2[i].fourier[iz] += rho[j].fourier[iz]*w2[i][j].fourier[iz];
             }
+            n1[i].fourier[iz] += 0.5*rho[0].fourier[iz]*w1[i][0].fourier[iz];
+            n2[i].fourier[iz] += 0.5*rho[0].fourier[iz]*w2[i][0].fourier[iz];
+            n1[i].fourier[iz] += 0.5*rho[100].fourier[iz]*w1[i][100].fourier[iz];
+            n2[i].fourier[iz] += 0.5*rho[100].fourier[iz]*w2[i][100].fourier[iz];
+
+            n1[i].fourier[iz] *= DeltaK;
+            n2[i].fourier[iz] *= DeltaK;
         }
     }
     
@@ -205,23 +158,18 @@ void CalcN(){
     n3.invfft();
 }
 
-
 void CalcPHI(){
 
-    for( ix = 0; ix < n_bins; ix++){
-        for( iy = 0; iy < n_bins; iy++){
-            for( iz = 0; iz < n_bins; iz++){
-                on3 = 1-creal(n3.real[(ix*n_bins+iy)*n_bins+iz]);
-                inv_on3 = 1/on3;
-                
-                Phi0();
-                Phi3();
-               
-                for ( i = 0; i <= lmax; i++){
-                    Phi1();
-                    Phi2();
-                }
-            }
+    for( iz = 0; iz < n_bins; iz++){
+        on3 = 1-creal(n3.real[iz]);
+        inv_on3 = 1/on3;
+        
+        Phi0();
+        Phi3();
+       
+        for ( i = 0; i <= lmax; i++){
+            Phi1();
+            Phi2();
         }
     }
 
@@ -235,41 +183,39 @@ void CalcPHI(){
 
 void CalcSC(){
 
-    for( ix = 0; ix < n_bins; ix++){
-        for( iy = 0; iy < n_bins; iy++){
-            for( iz = 0; iz < n_bins; iz++){
-                sc0.fourier[(ix*n_bins+iy)*n_bins+iz] =  PHI0.fourier[(ix*n_bins+iy)*n_bins+iz]*w0.fourier[(ix*n_bins+iy)*n_bins+iz];
-                for ( i = 0; i <= lmax; i++){
-                    sc1[i].fourier[(ix*n_bins+iy)*n_bins+iz] =  -PHI1[i].fourier[(ix*n_bins+iy)*n_bins+iz]*w1[i].fourier[(ix*n_bins+iy)*n_bins+iz];
-                    sc2[i].fourier[(ix*n_bins+iy)*n_bins+iz] =  -PHI2[i].fourier[(ix*n_bins+iy)*n_bins+iz]*w2[i].fourier[(ix*n_bins+iy)*n_bins+iz];
-                }
-                sc3.fourier[(ix*n_bins+iy)*n_bins+iz] =  PHI3.fourier[(ix*n_bins+iy)*n_bins+iz]*w3.fourier[(ix*n_bins+iy)*n_bins+iz];
+    for( iz = 0; iz < n_bins; iz++){
+        sc0.fourier[iz] =  PHI0.fourier[iz]*w0.fourier[iz];
+        for ( i = 0; i <= lmax; i++){
+            for ( j = 0; j <= 100; j++){
+                sc1[i][j].fourier[iz] =  PHI1[i].fourier[iz]*w1[i][j].fourier[iz];
+                sc2[i][j].fourier[iz] =  PHI2[i].fourier[iz]*w2[i][j].fourier[iz];
             }
         }
+        sc3.fourier[iz] =  PHI3.fourier[iz]*w3.fourier[iz];
     }
 
     sc0.invfft();
     for ( i = 0; i <= lmax; i++){
-        sc1[i].invfft();
-        sc2[i].invfft();
+        for ( j = 0; j <= 100; j++){
+            sc1[i][j].invfft();
+            sc2[i][j].invfft();
+        }
     }
     sc3.invfft();
 }
 
+
 void CalcC(){
 
-    for( ix = 0; ix < n_bins; ix++){ 
-        for( iy = 0; iy < n_bins; iy++){ 
-            for( iz = 0; iz < n_bins; iz++){ 
-                c1.real[(ix*n_bins+iy)*n_bins+iz] = 0;
-                c1.real[(ix*n_bins+iy)*n_bins+iz] -= sc0.real[(ix*n_bins+iy)*n_bins+iz];
-                for ( i = 0; i <= lmax; i++){
-                    c1.real[(ix*n_bins+iy)*n_bins+iz] -= sc1[i].real[(ix*n_bins+iy)*n_bins+iz];
-                    c1.real[(ix*n_bins+iy)*n_bins+iz] -= sc2[i].real[(ix*n_bins+iy)*n_bins+iz];
-                }
-                c1.real[(ix*n_bins+iy)*n_bins+iz] -= sc3.real[(ix*n_bins+iy)*n_bins+iz];
+    for( iz = 0; iz < n_bins; iz++){ 
+        for ( j = 0; j <= 100; j++){
+            c1[j].real[iz] = 0;
+            c1[j].real[iz] -= sc0.real[iz];
+            for ( i = 0; i <= lmax; i++){
+                c1[j].real[iz] -= sc1[i][j].real[iz];
+                c1[j].real[iz] -= sc2[i][j].real[iz];
             }
+            c1[j].real[iz] -= sc3.real[iz];
         }
     }
-
 }

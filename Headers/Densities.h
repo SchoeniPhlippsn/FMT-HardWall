@@ -8,10 +8,11 @@ double w0func (double z, struct paras p) {
 
 
     double f;
-    if(z>0) f = 0.5*gaussC(z,a1,a2,b)*RR(z,a1,a2,b)*gsl_sf_bessel_J0(kr*RR(z,a1,a2,b));
-    else{
+    if(z>0){ 
+        f = 0.5*gaussC(z,a1,a2,b)*RRAbl2(z,a1,a2,b);
+    }else{
         z *= -1;
-        f = 0.5*gaussC(z,a1,a3,b)*RR(z,a1,a3,b)*gsl_sf_bessel_J0(kr*RR(z,a1,a3,b));
+        f = 0.5*gaussC(z,a1,a3,b)*RRAbl2(z,a1,a3,b);
     }
     
     return f;
@@ -31,33 +32,33 @@ double w1func (double z, struct paras p) {
     if(l==0){ 
         if(z>0){ 
             theta = getTheta(z,a1,a2,b);
-            f = 0.5*RR(z,a1,a2,b)*Wignerd(theta,l,m,0)*gsl_sf_bessel_J0(kr*RR(z,a1,a2,b))*meanC(z,a1,a2,b);
+            f = 0.5*Wignerd(theta,l,m,0)*meanC(z,a1,a2,b)*RRAbl2(z,a1,a2,b);
         }else{
             z *= -1;
             theta = getTheta(z,a1,a3,b);
-            f = 0.5*RR(z,a1,a3,b)*Wignerd(theta,l,m,0)*gsl_sf_bessel_Jn(m,kr*RR(z,a1,a3,b))*meanC(z,a1,a3,b);
+            f = 0.5*Wignerd(theta,l,m,0)*meanC(z,a1,a3,b)*RRAbl2(z,a1,a3,b);
         }
     }
     if(l==1){
         if(z>0){
             theta = getTheta(z,a1,a2,b);
-            f = -0.5*RR(z,a1,a2,b)*Wignerd(theta,l,m,0)*gsl_sf_bessel_Jn(m,kr*RR(z,a1,a2,b))*meanC(z,a1,a2,b);
+            f = -0.5*Wignerd(theta,l,m,0)*meanC(z,a1,a2,b)*RRAbl2(z,a1,a2,b);
         }else{ 
             z *= -1;
             theta = getTheta(z,a1,a3,b);
-            f = -0.5*RR(z,a1,a3,b)*Wignerd(theta,l,m,0)*gsl_sf_bessel_Jn(m,kr*RR(z,a1,a3,b))*meanC(z,a1,a3,b);
+            f = -0.5*Wignerd(theta,l,m,0)*meanC(z,a1,a3,b)*RRAbl2(z,a1,a3,b);
         }
     }
     if(l>1){
         if(z>0){ 
             theta = getTheta(z,a1,a2,b);
             double Wig = Wignerd(theta,l,m,2)+Wignerd(theta,l,m,-2);
-            f = 2*M_PI*RR(z,a1,a2,b)*Wig*gsl_sf_bessel_Jn(m,kr*RR(z,a1,a2,b))*diffC(z,a1,a2,b)*SHN(l,2)*SHN(l,0);
+            f = 2*M_PI*Wig*diffC(z,a1,a2,b)*SHN(l,2)*SHN(l,0)*RRAbl2(z,a1,a2,b);
         }else{
             z *= -1;
             theta = getTheta(z,a1,a3,b);
             double Wig = Wignerd(theta,l,m,2)+Wignerd(theta,l,m,-2);
-            f = 2*M_PI*RR(z,a1,a3,b)*Wig*gsl_sf_bessel_Jn(m,kr*RR(z,a1,a3,b))*diffC(z,a1,a3,b)*SHN(l,2)*SHN(l,0);
+            f = 2*M_PI*Wig*diffC(z,a1,a3,b)*SHN(l,2)*SHN(l,0)*RRAbl2(z,a1,a3,b);
         }
         if( l % 2 == 1) f *= -1;
     }
@@ -77,11 +78,11 @@ double w2func (double z, struct paras p) {
     double theta;
     if(z>0){ 
         theta = getTheta(z,a1,a2,b);
-        f = 2*M_PI*RR(z,a1,a2,b)*Wignerd(theta,l,m,0)*gsl_sf_bessel_Jn(m,kr*RR(z,a1,a2,b));
+        f = M_PI*Wignerd(theta,l,m,0)*RRAbl2(z,a1,a2,b);
     }else{ 
         z *= -1;
         theta = getTheta(z,a1,a3,b);
-        f = 2*M_PI*RR(z,a1,a3,b)*Wignerd(theta,l,m,0)*gsl_sf_bessel_Jn(m,kr*RR(z,a1,a3,b));
+        f = M_PI*Wignerd(theta,l,m,0)*RRAbl2(z,a1,a3,b);
     }
 
     return f;
@@ -95,11 +96,11 @@ double w3func (double z, struct paras p) {
     double b = p.y_para;
     
     double f;
-    if(z>0) f = 2*M_PI*RR(z,a1,a2,b)*gsl_sf_bessel_J1(kr*RR(z,a1,a2,b));
+    if(z>0) f = M_PI*RR(z,a1,a2,b)*RR(z,a1,a2,b);
     else{ 
         z *= -1;
-        f = 2*M_PI*RR(z,a1,a3,b)*gsl_sf_bessel_J1(kr*RR(z,a1,a3,b));
+        f = M_PI*RR(z,a1,a3,b)*RR(z,a1,a3,b);
     }
      
-    return f/(b*kr);
+    return f;
 }

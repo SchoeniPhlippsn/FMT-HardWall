@@ -16,134 +16,128 @@
 
 int main (){
 
-	n_bins = 64;
+	n_bins = 1024;
 	n_bins_2 = n_bins/2;
 	inv_n = 1./n_bins;
 
-	H = 10;
+	H = 20;
 	H2 = H/2;
 	
 	RII = 0.5*sqrt(0.5);
-	RT = 1.5*sqrt(0.5);
 
 	DeltaR = H*inv_n;
-	DeltaK = inv_n*2*M_PI/DeltaR;
+	DeltaK = M_PI/100;
 
-    inv_nDeltaR = inv_n*DeltaR*inv_n*DeltaR*inv_n*DeltaR;
+    inv_nDeltaR = inv_n*DeltaR;
 
-	bulk = 0.3*H*H*H/((H-2*RII)*(H-2*RII)*(H-2*RT)*4*M_PI*RII*RII*RII);
+	bulk = 0.3*H/((H-2*RII)*4*M_PI*M_PI*RII*RII*RII);
 
-	rho_sum_o = (H-2*RII)*(H-2*RII)*(H-2*RT)*bulk*n_bins*n_bins*n_bins/(H*H*H);
+	rho_sum_o = (H-2*RII)*bulk*n_bins/H;
     
-    alpha = 0.1;
+    alpha = 0.001;
 
     Setup(); 
     
     CalcRho();
-	
+
     CalcW0();
-    
+        
+    w0.print(n_bins,DeltaR); 
+
     CalcW1();
+    
+    w1[0][0].print(n_bins,DeltaR); 
+    w1[0][20].print(n_bins,DeltaR); 
+    
     CalcW2();
+    
+    w2[0][0].print(n_bins,DeltaR); 
+    w2[0][20].print(n_bins,DeltaR); 
+    
     CalcW3();
-            
-    /*w0.print(n_bins,DeltaR); 
-    w1[0].print(n_bins,DeltaR); 
-    w1[1].print(n_bins,DeltaR); 
-    w1[2].print(n_bins,DeltaR); 
-    w1[3].print(n_bins,DeltaR); 
-    w1[4].print(n_bins,DeltaR); 
-    w2[0].print(n_bins,DeltaR); 
-    w2[1].print(n_bins,DeltaR); 
-    w2[2].print(n_bins,DeltaR); 
-    w2[3].print(n_bins,DeltaR); 
-    w2[4].print(n_bins,DeltaR); 
-    w3.invfft();
-    w3.print(n_bins,DeltaR);*/
+    
+    w3.print(n_bins,DeltaR); 
+          
+    for( st = 0 ; st <= 10000; st++){
+        for(j=0; j<= 100; j++) rho[j].fft();
 
-    for( st = 0 ; st <= 1000; st++){
-
-        rho.fft();
-       // if(st==0) rho.print(n_bins,DeltaR);
 
         CalcN();
-    
-        /*if(st==0){		
-            n0.print(n_bins,DeltaR); 
-            n12.print(n_bins,DeltaR); 
-            n222.print(n_bins,DeltaR); 
-            n3.print(n_bins,DeltaR); 
-        }*/
-    
+        
+        
         CalcPHI();
 
-    /*
-        if(st==0){		
-            PHI0.print(n_bins,DeltaR); 
-            PHI12.print(n_bins,DeltaR); 
-            PHI222.print(n_bins,DeltaR); 
-            PHI3.print(n_bins,DeltaR); 
-        }*/
-
+        
         CalcSC();
-
-/*
-        if(st==0){		
-            sc0.print(n_bins,DeltaR); 
-            sc12.print(n_bins,DeltaR); 
-            sc222.print(n_bins,DeltaR); 
-            sc3.print(n_bins,DeltaR); 
-        }
-*/
+    
+        
         CalcC();
-
-       // if(st==0) c1.print(n_bins,DeltaR); 
 		
-        rho_sum = 0;
+        if(st==0){
+            rho[0].print(n_bins,DeltaR); 
+            n0.print(n_bins,DeltaR); 
+            n1[0].print(n_bins,DeltaR); 
+            n2[0].print(n_bins,DeltaR); 
+            n3.print(n_bins,DeltaR); 
+            PHI0.print(n_bins,DeltaR); 
+            PHI1[0].print(n_bins,DeltaR); 
+            PHI2[0].print(n_bins,DeltaR); 
+            PHI3.print(n_bins,DeltaR); 
+            sc0.print(n_bins,DeltaR); 
+            sc1[0][0].print(n_bins,DeltaR); 
+            sc1[0][20].print(n_bins,DeltaR); 
+            sc2[0][0].print(n_bins,DeltaR); 
+            sc2[0][20].print(n_bins,DeltaR); 
+            sc3.print(n_bins,DeltaR); 
+            c1[0].print(n_bins,DeltaR); 
+            c1[20].print(n_bins,DeltaR); 
+        } 
 
-        for ( ix = 0; ix < n_bins; ix++){
-            x = DeltaR*(ix+0.5);
-            if(x > H2) x = H-x;
-            for ( iy = 0; iy < n_bins; iy++){
-                y = DeltaR*(iy+0.5);
-                if(y > H2) y = H-y;
-                for ( iz = 0; iz < n_bins; iz++){
-                    z = DeltaR*(iz+0.5);
-                    if(z > H2) z = H - z;
-                    if( x <= RII || y <= RII || z <= RT ) rho_n.real[(ix*n_bins+iy)*n_bins+iz] = 0.;
-                    else rho_n.real[(ix*n_bins+iy)*n_bins+iz] = exp(creal(c1.real[(ix*n_bins+iy)*n_bins+iz]));// + rho_sum[(ix]));
-                    rho_sum += creal(rho_n.real[(ix*n_bins+iy)*n_bins+iz]);
+        for(j=0; j<= 100; j++){
+            
+            rho_sum = 0;
+            
+            theta = DeltaK*j;
+
+            b2 = WallDistance(theta);
+            
+            theta = DeltaK*(100-j);
+            
+            b3 = WallDistance(theta);
+
+            for ( iz = 0; iz < n_bins; iz++){
+                z = DeltaR*(iz+0.5);
+                if(z <= H2){ 
+                    if( z <= b2 ) rhon[j].real[iz] = 0.;
+                    else rhon[j].real[iz] = exp(creal(c1[j].real[iz]));// + rho_sum[(ix]));
+                }else{
+                    z = H - z;
+                    if( z <= b3 ) rhon[j].real[iz] = 0.;
+                    else rhon[j].real[iz] = exp(creal(c1[j].real[iz]));// + rho_sum[(ix]));
                 }
+                rho_sum += creal(rhon[j].real[iz]);
             }
-		}
 		
-        sclf = rho_sum_o/rho_sum;
+            sclf = rho_sum_o/rho_sum;
+            if(st%1==0 && j== 100 ) printf("%i %f %f\n",st, rho_sum, sclf);
 
-        if(st==0) rho_n.print(n_bins,DeltaR); 
-		
-        if(st%1==0)printf("%i %f %f\n",st,rho_sum, sclf);
-		for( ix =0; ix < n_bins; ix++){
-			for( iy =0; iy < n_bins; iy++){
-                for( iz =0; iz < n_bins; iz++){
-                    rho_n.real[(ix*n_bins+iy)*n_bins+iz] *= sclf;
-                    rho.real[(ix*n_bins+iy)*n_bins+iz] = rho.real[(ix*n_bins+iy)*n_bins+iz]*(1-alpha) + rho_n.real[(ix*n_bins+iy)*n_bins+iz]*alpha;     
-                }
-            }
-		}
-    }    
-
-	FILE * oFile;
-	FILE * oFile1;
-
-	oFile = fopen ("Results/rho_fin.dat","w");
-	oFile1 = fopen ("Results/rho_fin0.dat","w");
-
-	for( ix =0; ix < n_bins; ix++){
-		for( iy =0; iy < n_bins; iy++){
-            fprintf (oFile1, "%f %f %f %f\n", DeltaR*(ix+0.5), DeltaR*(iy+0.5), creal(rho.real[(ix*n_bins+iy)*n_bins+n_bins_2]), cimag(rho.real[(ix*n_bins+iy)*n_bins+n_bins_2]));
             for( iz =0; iz < n_bins; iz++){
-                fprintf (oFile, "%f %f %f %f %f\n", DeltaR*(ix+0.5), DeltaR*(iy+0.5), DeltaR*(iz+0.5), creal(rho.real[(ix*n_bins+iy)*n_bins+iz]), cimag(rho.real[(ix*n_bins+iy)*n_bins+iz]));
+                rhon[j].real[iz] *= sclf;
+                rho[j].real[iz] = rho[j].real[iz]*(1-alpha) + rhon[j].real[iz]*alpha;     
             }
         }
-	}
+    }    
+    
+    FILE * oFile;
+    FILE * oFile2;
+
+    oFile = fopen ("Results/rho_fin80.dat","w");
+    oFile2 = fopen ("Results/rho_fin20.dat","w");
+
+
+    for( iz =0; iz < n_bins; iz++){
+        fprintf (oFile, "%f %f %f\n", DeltaR*(iz+0.5), creal(rho[80].real[iz]), cimag(rho[80].real[iz]));
+        fprintf (oFile2, "%f %f %f\n", DeltaR*(iz+0.5), creal(rho[20].real[iz]), cimag(rho[20].real[iz]));
+    }
+    
 }
