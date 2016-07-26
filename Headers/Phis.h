@@ -15,7 +15,7 @@ void Phi2(){
 
     PHI2[i].real[iz] = n1[i].real[iz]*inv_on3;
 
-    if(i==0){
+    if(i==0 && lmax>1){
         PHI2[i].real[iz] += 3*9*ThirdTermTR(0,0,0,0,0,0)*n2[0].real[iz]*n2[0].real[iz]*inv_on3*inv_on3;
         l2=2;
         l3=2;  
@@ -50,6 +50,7 @@ void Phi2(){
 void Phi3(){
     
     PHI3.real[iz] = n0.real[iz]*inv_on3;
+        
     l2=0;
     l3=0;
     for ( l1 = 0; l1 <= lmax; l1++){
@@ -62,7 +63,7 @@ void Phi3(){
             l2=2;
             l3=2;
         }
-        while(l2 < 3){
+        while(l2 < 3 && l2 <= lmax){
             Coupling3 = ThirdTermTR(l1,l2,l3,0,0,0);
             if( Coupling3 > 1e-6 || Coupling3 < -1e-6){
                 PHI3.real[iz] += 2*9*Coupling3*n2[l1].real[iz]*n2[l2].real[iz]*n2[l3].real[iz]*inv_on3*inv_on3*inv_on3;

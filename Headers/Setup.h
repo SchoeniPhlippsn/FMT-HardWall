@@ -9,14 +9,10 @@ inline std::string toString(const T& t){
 
 void Setup(){
 
-    w0.setup(n_bins,"w0.dat");
-    w3.setup(n_bins,"w3.dat");
     n0.setup(n_bins,"n0.dat");
     n3.setup(n_bins,"n3.dat");
     PHI0.setup(n_bins,"PHI0.dat");
     PHI3.setup(n_bins,"PHI3.dat");
-    sc0.setup(n_bins,"sc0.dat");
-    sc3.setup(n_bins,"sc3.dat");
     
     for( i = 0; i <= lmax ; i++){
         std::string is = toString(i); 
@@ -29,8 +25,12 @@ void Setup(){
     for( j=0; j <= 100; j++){
         std::string js = toString(j); 
 
+        w0[j].setup(n_bins,"w0_" + js + ".dat");
+        w3[j].setup(n_bins,"w3_" + js + ".dat");
         rho[j].setup(n_bins,"rho_" + js + ".dat");
         rhon[j].setup(n_bins,"rhon_" + js + ".dat");
+        sc0[j].setup(n_bins,"sc0_" + js + ".dat");
+        sc3[j].setup(n_bins,"sc3_" + js + ".dat");
         c1[j].setup(n_bins,"c1_" + js + ".dat");
 
         for( i = 0; i <= lmax ; i++){

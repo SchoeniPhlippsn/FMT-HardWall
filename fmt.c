@@ -5,6 +5,7 @@
 #include <malloc.h>
 #include <complex.h>
 #include <gsl/gsl_integration.h>
+#include <gsl/gsl_errno.h>
 #include <gsl/gsl_sf_bessel.h>
 #include <gsl/gsl_sf_gamma.h>
 #include <gsl/gsl_sf_coupling.h>
@@ -26,43 +27,41 @@ int main (){
 	RII = 0.5*sqrt(0.5);
 
 	DeltaR = H*inv_n;
-	DeltaK = M_PI/100;
+	DeltaK = inv_n*2*M_PI/DeltaR;
+	DeltaT = M_PI/100;
+	DeltaP = b1/50;
 
     inv_nDeltaR = inv_n*DeltaR;
 
-	bulk = 0.3*H/((H-2*RII)*4*M_PI*M_PI*RII*RII*RII);
+	bulk = 0.3*H/((H-2*RII)*4*M_PI*RII*RII*RII *M_PI);
 
-	rho_sum_o = (H-2*RII)*bulk*n_bins/H;
-    
-    alpha = 0.001;
+    alpha = 0.1;
 
     Setup(); 
     
     CalcRho();
 
     CalcW0();
-        
-    w0.print(n_bins,DeltaR); 
-
+       
+    w0[0].print(n_bins,DeltaR); 
+    
     CalcW1();
     
     w1[0][0].print(n_bins,DeltaR); 
-    w1[0][20].print(n_bins,DeltaR); 
     
     CalcW2();
     
     w2[0][0].print(n_bins,DeltaR); 
-    w2[0][20].print(n_bins,DeltaR); 
     
     CalcW3();
     
-    w3.print(n_bins,DeltaR); 
-         
+    w3[0].print(n_bins,DeltaR); 
+
     st =0;
     
     now = 0;
     prev = 1; 
-    while( fabs(prev-now) > 1e-6  ){
+    while( fabs(now-prev)>1e-8  ){
         for(j=0; j<= 100; j++) rho[j].fft();
 
         CalcN();
@@ -86,15 +85,15 @@ int main (){
             PHI1[0].print(n_bins,DeltaR); 
             PHI2[0].print(n_bins,DeltaR); 
             PHI3.print(n_bins,DeltaR); 
-            sc0.print(n_bins,DeltaR); 
+            sc0[0].print(n_bins,DeltaR); 
             sc1[0][0].print(n_bins,DeltaR); 
             sc1[0][20].print(n_bins,DeltaR); 
             sc2[0][0].print(n_bins,DeltaR); 
             sc2[0][20].print(n_bins,DeltaR); 
-            sc3.print(n_bins,DeltaR); 
+            sc3[0].print(n_bins,DeltaR); 
             c1[0].print(n_bins,DeltaR); 
             c1[20].print(n_bins,DeltaR); 
-        } 
+        }
 
         CalcRhoN();
         st++;
@@ -104,10 +103,6 @@ int main (){
         std::string js = toString(j); 
         rho[j].Filename = "rho_fin" + js + ".dat"; 
         rho[j].printReal(n_bins, DeltaR);
-
-        theta = j*DeltaK;
-        
-        printf("%f %f\n",theta,WallDistance(theta));
     }
    
     for( iz = 0; iz < n_bins; iz++){
@@ -117,9 +112,8 @@ int main (){
             rho[0].real[iz] += rho[j].real[iz];
             rho[0].real[iz] += rho[j].real[iz];
         }
-        rho[0].real[iz] *= DeltaK;
+        rho[0].real[iz] *= DeltaT;
     }
     rho[0].Filename = "rho_fin.dat";
     rho[0].printReal(n_bins, DeltaR);
-
 }
