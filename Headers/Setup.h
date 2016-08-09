@@ -13,6 +13,7 @@ void Setup(){
     n3.setup(n_bins,"n3.dat");
     PHI0.setup(n_bins,"PHI0.dat");
     PHI3.setup(n_bins,"PHI3.dat");
+    rho_fin.setup(n_bins,"rho_fin.dat");
     
     for( i = 0; i <= lmax ; i++){
         std::string is = toString(i); 

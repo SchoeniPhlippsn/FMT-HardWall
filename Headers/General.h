@@ -7,6 +7,8 @@
     const double a2 = a1*(kth-asp)/kth;
     const double a3 = a1*(kth+asp)/kth;
     const double b1 = 1.5*sqrt(0.5);
+    const double b1_inv = 1/b1;
+    const double InvPi=1/M_PI;
 
 //WeightDensities
     class weight w0[101];
@@ -18,6 +20,7 @@
 
 	class weight rho[101];
 	class weight rhon[101];
+	class weight rho_fin;
 	class weight n0;
     class weight n1[lmax+1];
     class weight n2[lmax+1];
@@ -34,17 +37,19 @@
 
 //Universal Variables
 	int n_bins, n_bins_2;
-    double z, kz, theta;
+    double z, zz, kz, theta, atheta;
 	double inv_n, H, H2, RII, RT;
-    double DeltaR, DeltaK, DeltaT, DeltaP, bulk, inv_nDeltaR;
+    double DeltaR, DeltaK, DeltaT, DeltaP, inv_nDeltaR;
 	int i, j, iz, v, st;
     int l,m, l1, l2, l3, m1, m2, m3;
-    double prev, now;
+    double prev, now, tt, aa;
      
 //Varaibles Calc.h    
+    int numb;
     double real, imag, costheta, sintheta;
-    double errorReal, errorImag;
-    struct paras params = {0, a1, a2, a3, b1, 0, 0};
+    double complex coskz, sincosb1, cossinb1;
+    double errorReal, errorImag, Wig;
+    struct paras params = {0, 0, 0};
     
 //Varaiables PHI
 
@@ -55,5 +60,5 @@
 
 //Varaiables rhon
 
-    double b2, b3, rho_sum_o[101], rho_sum;
+    double b2, b3, rho_sum_o, rho_sum;
 

@@ -1,5 +1,5 @@
 
-struct paras { double kr; double x_para1; double x_para2; double x_para3; double y_para; int l; int m; };
+struct paras { double kr; int l; int m; };
 
 class weight { 
 	public:
@@ -54,7 +54,7 @@ void weight::print (int n_bins, double Delta){
 	ftFile = fopen (file,"w");
 	
     for( int iz =0; iz < n_bins; iz++){
-        double z = iz*Delta;
+        double z = (iz+0.5)*Delta;
         fprintf (reFile, "%.18f %.18f %.18f\n", z, creal(real[iz]), cimag(real[iz]));
         fprintf (ftFile, "%.18f %.18f %.18f\n", z, creal(fourier[iz]), cimag(fourier[iz]));
     }

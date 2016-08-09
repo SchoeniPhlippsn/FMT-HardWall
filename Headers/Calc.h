@@ -3,31 +3,45 @@ void CalcRho(){
     
     for(j=0; j<= 100; j++){
         
-        rho_sum_o[j] = 0;
-
-        theta = DeltaT*j;
-
-        b2 = WallDistance(theta);
-        
-        theta = DeltaT*(100-j);
-        
+        theta = j*0.02-1;
         b3 = WallDistance(theta);
+        
+        theta = -theta;
+        
+        b2 = WallDistance(theta);
         
         for ( iz = 0; iz < n_bins; iz++){
             z = DeltaR*(iz+0.5);
             if(z <= H2){ 
                 if( z <= b2 ) rho[j].real[iz] = 0.;
-                else rho[j].real[iz] = bulk;
+                else rho[j].real[iz] = 1;
             }else{
                 z = H - z;
                 if( z <= b3 ) rho[j].real[iz] = 0.;
-                else rho[j].real[iz] = bulk;
+                else rho[j].real[iz] = 1;
             }
-            rho_sum_o[j] += creal(rho[j].real[iz]);
         }
-
-
     }
+    
+    rho_sum = 0;
+    for( iz = 0; iz < n_bins; iz++){
+
+        rho_fin.real[iz] = 0.5*(rho[0].real[iz]+rho[100].real[iz]);
+
+        for ( j = 1; j < 100; j++){
+            rho_fin.real[iz] += rho[j].real[iz];
+        }
+        rho_fin.real[iz] *= 0.02;
+        
+        rho_sum += creal(rho_fin.real[iz]);
+    }
+    sclf = rho_sum_o/rho_sum;
+    
+    for( iz =0; iz < n_bins; iz++){ 
+        rho_fin.real[iz] *= sclf; 
+        for(j=0; j<= 100; j++) rho[j].real[iz] *= sclf;
+    }
+     
     std::cout << "Calculated:  Rho" << std::endl;
 }
 
@@ -35,11 +49,11 @@ void CalcRho(){
 void CalcW0(){
 
     for( j = 0; j <= 100; j++){
-        theta = DeltaT*j;
-        costheta = DeltaK*cos(theta);
-        sintheta = DeltaK*sin(theta);
+        theta = j*0.02-1;
+        costheta = DeltaK*theta;
+        sintheta = DeltaK*sqrt(1-theta*theta);
         for ( iz = 0; iz < n_bins; iz++){
-            if( iz < n_bins/2){
+            if( iz < n_bins_2){
                 params.kr = sintheta*iz;
                 kz = costheta*iz;
             }else{
@@ -47,28 +61,30 @@ void CalcW0(){
                 kz = costheta*(iz-n_bins);
             }
             
-            w0[j].fourier[iz] = 0.5*(w0func(b1,params)*(cos(kz*b1)-I*sin(kz*b1))+w0func(-b1,params)*(cos(kz*b1)+I*sin(kz*b1))) ;
+            w0[j].fourier[iz] = 0.5*(w0func(b1,params)*cexp(-I*kz*b1)+w0func(-b1,params)*cexp(I*kz*b1));
             z= -b1+DeltaP;
             while(z < b1){ 
-                w0[j].fourier[iz] += w0func(z,params)*(cos(kz*z)-I*sin(kz*z));
+                w0[j].fourier[iz] += w0func(z,params)*cexp(-I*kz*z);
                 z += DeltaP;
             }
-            w0[j].fourier[iz] *= inv_n*b1/50;
+            w0[j].fourier[iz] *= DeltaP*inv_n;
         }
         std::cout << "             W0[" << j << "]" << std::endl;
     }
+    
+    for( j = 0; j <= 100; j++) w0[j].invfft();
 }
 
 void CalcW1(){
             
     for ( j = 0; j <= 100; j++){
-        theta = DeltaT*j;
-        costheta = DeltaK*cos(theta);
-        sintheta = DeltaK*sin(theta);
+        theta = j*0.02-1;
+        costheta = DeltaK*theta;
+        sintheta = DeltaK*sqrt(1-theta*theta);
         for ( i = 0; i <= lmax; i++){
             params.l = i;
             for ( iz = 0; iz < n_bins; iz++){
-                if( iz < n_bins/2){
+                if( iz < n_bins_2){
                     params.kr = sintheta*iz;
                     kz = costheta*iz;
                 }else{
@@ -76,18 +92,18 @@ void CalcW1(){
                     kz = costheta*(iz-n_bins);
                 }
 
-                w1[i][j].real[iz] = 0;
+                w1[i][j].fourier[iz] = 0;
                 for( v = 0; v<=2*i; v++){
                     params.m = v-i;
 
-                    w1[i][j].real[iz] = 0.5*(w1func(b1,params)*(cos(kz*b1)-I*sin(kz*b1))+w1func(-b1,params)*(cos(kz*b1)+I*sin(kz*b1)));
+                    w1[i][j].real[iz] = 0.5*(w1func(b1,params)*cexp(-I*kz*b1)+w1func(-b1,params)*cexp(I*kz*b1));
                     z= -b1+DeltaP;
                     while(z < b1){ 
-                        w1[i][j].real[iz] += w1func(z,params)*(cos(kz*z)-I*sin(kz*z));
+                        w1[i][j].real[iz] += w1func(z,params)*cexp(-I*kz*z);
                         z += DeltaP;
                     }
-                    w1[i][j].real[iz] *= inv_n*b1/50;
-                    
+                    w1[i][j].real[iz] *= DeltaP*inv_n;
+
                     w1[i][j].fourier[iz] += Wignerd(-theta, i ,0, params.m)*w1[i][j].real[iz];
                 } 
             }
@@ -100,13 +116,13 @@ void CalcW1(){
 void CalcW2(){
     
     for ( j = 0; j <= 100; j++){
-        theta = DeltaT*j;
-        costheta = DeltaK*cos(theta);
-        sintheta = DeltaK*sin(theta);
+        theta = j*0.02-1;
+        costheta = DeltaK*theta;
+        sintheta = DeltaK*sqrt(1-theta*theta);
         for ( i = 0; i <= lmax; i++){
             params.l = i;
             for ( iz = 0; iz < n_bins; iz++){
-                if( iz < n_bins/2){
+                if( iz < n_bins_2){
                     params.kr = sintheta*iz;
                     kz = costheta*iz;
                 }else{
@@ -114,19 +130,19 @@ void CalcW2(){
                     kz = costheta*(iz-n_bins);
                 }
 
-                w2[i][j].real[iz] = 0;
+                w2[i][j].fourier[iz] = 0;
                 for( v = 0; v<=2*i; v++){
                     params.m = v-i;
 
-                    w2[i][j].real[iz] = 0.5*(w2func(b1,params)*(cos(kz*b1)-I*sin(kz*b1))+w2func(-b1,params)*(cos(kz*b1)+I*sin(kz*b1)));
+                    w2[i][j].real[iz] = 0.5*(w2func(b1,params)*cexp(-I*kz*b1)+w2func(-b1,params)*cexp(I*kz*b1));
                     z= -b1+DeltaP;
                     while(z < b1){ 
-                        w2[i][j].real[iz] += w2func(z,params)*(cos(kz*z)-I*sin(kz*z));
+                        w2[i][j].real[iz] += w2func(z,params)*cexp(-I*kz*z);
                         z += DeltaP;
                     }
-                    w2[i][j].real[iz] *= inv_n*b1/50;
+                    w2[i][j].real[iz] *= DeltaP*inv_n;
                     
-                    w2[i][j].fourier[iz] += Wignerd(-theta, i ,0, params.m)*w1[i][j].real[iz];
+                    w2[i][j].fourier[iz] += Wignerd(-theta, i ,0, params.m)*w2[i][j].real[iz];
                 } 
             }
             std::cout << "             W2_" << i << "[" << j << "]" << std::endl;
@@ -137,11 +153,12 @@ void CalcW2(){
 void CalcW3(){
 
     for( j = 0; j <= 100; j++){
-        theta = DeltaT*j;
-        costheta = DeltaK*cos(theta);
-        sintheta = DeltaK*sin(theta);
+        //theta = DeltaT*j;
+        theta = j*0.02-1;
+        costheta = DeltaK*theta;
+        sintheta = DeltaK*sqrt(1-theta*theta);
         for ( iz = 0; iz < n_bins; iz++){
-            if( iz < n_bins/2){
+            if( iz < n_bins_2){
                 params.kr = sintheta*iz;
                 kz = costheta*iz;
             }else{
@@ -149,15 +166,14 @@ void CalcW3(){
                 kz = costheta*(iz-n_bins);
             }
             
-            w3[j].fourier[iz] = 0.5*(w3func(b1,params)*(cos(kz*b1)-I*sin(kz*b1))+w3func(-b1,params)*(cos(kz*b1)+I*sin(kz*b1))) ;
+            w3[j].fourier[iz] = 0.5*(w3func(b1,params)*cexp(-I*kz*b1)+w3func(-b1,params)*cexp(I*kz*b1)) ;
             z= -b1+DeltaP;
             while(z < b1){ 
-                w3[j].fourier[iz] += w3func(z,params)*(cos(kz*z)-I*sin(kz*z));
+                w3[j].fourier[iz] += w3func(z,params)*cexp(-I*kz*z);
                 z += DeltaP;
             }
-            w3[j].fourier[iz] *= inv_n*b1/50;
+            w3[j].fourier[iz] *= DeltaP*inv_n;
         }
-        w3[j].invfft();
         std::cout << "             W3[" << j << "]" << std::endl;
     }
 }
@@ -178,8 +194,8 @@ void CalcN(){
         n0.fourier[iz] += 0.5*rho[100].fourier[iz]*w0[j].fourier[iz];
         n3.fourier[iz] += 0.5*rho[100].fourier[iz]*w3[j].fourier[iz];
 
-        n0.fourier[iz] *= DeltaT;
-        n3.fourier[iz] *= DeltaT;
+        n0.fourier[iz] *= 0.02;
+        n3.fourier[iz] *= 0.02;
 
         for ( i = 0; i <= lmax; i++){
             n1[i].fourier[iz] = 0;
@@ -193,8 +209,8 @@ void CalcN(){
             n1[i].fourier[iz] += 0.5*rho[100].fourier[iz]*w1[i][100].fourier[iz];
             n2[i].fourier[iz] += 0.5*rho[100].fourier[iz]*w2[i][100].fourier[iz];
 
-            n1[i].fourier[iz] *= DeltaT;
-            n2[i].fourier[iz] *= DeltaT;
+            n1[i].fourier[iz] *= 0.02;
+            n2[i].fourier[iz] *= 0.02;
         }
     }
     
@@ -264,17 +280,18 @@ void CalcC(){
 
 void CalcRhoN(){
 
+    prev = now;
+    now = 0;
+    
     for(j=0; j<= 100; j++){
-        
-        rho_sum = 0;
-        
-        theta = DeltaT*j;
+    
+        theta = j*0.02-1;
 
-        b2 = WallDistance(theta);
-        
-        theta = DeltaT*(100-j);
-        
         b3 = WallDistance(theta);
+        
+        theta = -theta;
+        
+        b2 = WallDistance(theta);
 
         for ( iz = 0; iz < n_bins; iz++){
             z = DeltaR*(iz+0.5);
@@ -286,17 +303,28 @@ void CalcRhoN(){
                 if( z <= b3 ) rhon[j].real[iz] = 0.;
                 else rhon[j].real[iz] = exp(creal(-c1[j].real[iz]));// + rho_sum[(ix]));
             }
-            rho_sum += creal(rhon[j].real[iz]);
         }
+    } 
     
-        sclf = rho_sum_o[j]/rho_sum;
-        if(j== 100 ){ 
-            printf("%i %f %f\n",st, rho_sum, sclf);
-            prev = now;
-            now = rho_sum;
-        }
+    
+    rho_sum =0;
+    for( iz = 0; iz < n_bins; iz++){
+        rho_fin.real[iz] = 0.5*(rhon[0].real[iz]+rhon[100].real[iz]);
 
-        for( iz =0; iz < n_bins; iz++){
+        for ( j = 1; j < 100; j++){ 
+            rho_fin.real[iz] += rhon[j].real[iz];
+        }
+        rho_fin.real[iz] *= 0.02;
+        
+        rho_sum += creal(rho_fin.real[iz]);
+    }
+    now = rho_sum; 
+    sclf = rho_sum_o/rho_sum;
+    printf("%i %f %f\n", st, now, sclf);
+    
+    for( iz =0; iz < n_bins; iz++){ 
+        rho_fin.real[iz] *= sclf; 
+        for(j=0; j<= 100; j++){ 
             rhon[j].real[iz] *= sclf;
             rho[j].real[iz] = rho[j].real[iz]*(1-alpha) + rhon[j].real[iz]*alpha;     
         }

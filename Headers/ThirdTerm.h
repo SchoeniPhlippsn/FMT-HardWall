@@ -86,16 +86,18 @@ double ThirdTerm(int l1, int l2, int l3, int m1, int m2, int m3){
 double ThirdTermTR(int l1, int l2, int l3, int m1, int m2, int m3){
     //double C0 = (2*l1+1)*(2*l2+1)*(2*l3+1)/(48.0*M_PI)*gsl_sf_coupling_3j(2*l1,2*l2,2*l3,2*m1,2*m2,2*m3);
     
-    double C0 = gsl_sf_coupling_3j(2*l1,2*l2,2*l3,2*m1,2*m2,2*m3);
+    //double C0 = gsl_sf_coupling_3j(2*l1,2*l2,2*l3,2*m1,2*m2,2*m3);
     
-    if( C0<1e-6 && C0>-1e-6 ) return 0;
-    else{
-        double sum=0;
-        if( l1==0 && l2==0 && l3==0 ) sum = C0/(3*48*M_PI); 
-        if(l1==2 && l2 == 2 && l3 == 2) sum = -2.788866755*C0/(48*M_PI); 
-        if(l1==2 && l2 == 2 && l3 == 0) sum = -0.745355992*C0/(48*M_PI); 
-        if(l1==2 && l2 == 0 && l3 == 2) sum = -0.745355992*C0/(48*M_PI); 
-        if(l1==0 && l2 == 2 && l3 == 2) sum = -0.745355992*C0/(48*M_PI);  
-        return sum;
-    }
+    double sum=0;
+    //if( l1==0 && l2==0 && l3==0 ) sum = C0/(3*48*M_PI); 
+    if( l1==0 && l2==0 && l3==0 ) sum = 1/(3*48*M_PI); 
+    //if(l1==2 && l2 == 2 && l3 == 2) sum = -2.788866755*C0/(48*M_PI); 
+    if(l1==2 && l2 == 2 && l3 == 2) sum = 2/(3*48*M_PI); 
+    //if(l1==2 && l2 == 2 && l3 == 0) sum = -0.745355992*C0/(48*M_PI); 
+    //if(l1==2 && l2 == 0 && l3 == 2) sum = -0.745355992*C0/(48*M_PI); 
+    //if(l1==0 && l2 == 2 && l3 == 2) sum = -0.745355992*C0/(48*M_PI);  
+    if(l1==2 && l2 == 2 && l3 == 0) sum = -1/(3*48*M_PI); 
+    if(l1==2 && l2 == 0 && l3 == 2) sum = -1/(3*48*M_PI); 
+    if(l1==0 && l2 == 2 && l3 == 2) sum = -1/(3*48*M_PI);  
+    return sum;
 }

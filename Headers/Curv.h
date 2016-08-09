@@ -1,29 +1,27 @@
 
-double kappa1 (double z, double a1, double a2, double b) {
-    double tt = t(z,b);
-    double nenner = 16*b*b*(1-2*tt)*(1-2*tt)+9*a1*a1*(1-2*tt+2*tt*tt)*(1-2*tt+2*tt*tt)+9*a2*a2*(1-6*tt+6*tt*tt)*(1-6*tt+6*tt*tt)-18*a1*a2*(1-8*tt+20*tt*tt-24*tt*tt*tt+12*tt*tt*tt*tt);
+double kappa1 (double t, double aa) {
+    double nenner = 16*b1*b1*(1-2*t)*(1-2*t)+9*a1*a1*(1-2*t+2*t*t)*(1-2*t+2*t*t)+9*aa*aa*(1-6*t+6*t*t)*(1-6*t+6*t*t)-18*a1*aa*(1-8*t+20*t*t-24*t*t*t+12*t*t*t*t);
     nenner = sqrt(nenner);
     nenner = nenner*nenner*nenner;
-    double zaehler = 48*b*(a1*(1 - tt)*tt + a2*(1 - 3*tt + 3*tt*tt));
+    double zaehler = 48*b1*(a1*(1 - t)*t + aa*(1 - 3*t + 3*t*t));
     return zaehler/nenner;
 }
 
-double kappa2 (double z, double a1, double a2, double b) {
-    double tt = t(z,b);
-    double nenner = a1*(1-2*tt+2*tt*tt)-a2*(1-6*tt+6*tt*tt);
-    nenner = (3*a2*(1-tt)*tt+a1*(1-tt+tt*tt))*sqrt(16*b*b*(1-2*tt)*(1-2*tt)+9*nenner*nenner);
-    double zaehler = 4*b;
+double kappa2 (double t, double aa) {
+    double nenner = a1*(1-2*t+2*t*t)-aa*(1-6*t+6*t*t);
+    nenner = (3*aa*(1-t)*t+a1*(1-t+t*t))*sqrt(16*b1*b1*(1-2*t)*(1-2*t)+9*nenner*nenner);
+    double zaehler = 4*b1;
     return zaehler/nenner;
 }
 
-double gaussC (double z, double a1, double a2, double b){
-    return kappa1(z,a1,a2,b)*kappa2(z,a1,a2,b);
+double gaussC (double t, double aa){
+    return kappa1(t,aa)*kappa2(t,aa);
 }
 
-double meanC (double z, double a1, double a2, double b){
-    return 0.5*(kappa1(z,a1,a2,b)+kappa2(z,a1,a2,b));
+double meanC (double t, double aa){
+    return 0.5*(kappa1(t,aa)+kappa2(t,aa));
 }
 
-double diffC (double z, double a1, double a2, double b){
-    return 0.5*(kappa1(z,a1,a2,b)-kappa2(z,a1,a2,b));
+double diffC (double t, double aa){
+    return 0.5*(kappa1(t,aa)-kappa2(t,aa));
 }

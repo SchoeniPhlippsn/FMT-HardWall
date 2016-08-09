@@ -17,7 +17,7 @@
 
 int main (){
 
-	n_bins = 1024;
+	n_bins = 512;
 	n_bins_2 = n_bins/2;
 	inv_n = 1./n_bins;
 
@@ -25,43 +25,44 @@ int main (){
 	H2 = H/2;
 	
 	RII = 0.5*sqrt(0.5);
-
+    
 	DeltaR = H*inv_n;
 	DeltaK = inv_n*2*M_PI/DeltaR;
 	DeltaT = M_PI/100;
-	DeltaP = b1/50;
+	DeltaP = b1/100;
 
     inv_nDeltaR = inv_n*DeltaR;
 
-	bulk = 0.3*H/((H-2*RII)*4*M_PI*RII*RII*RII *M_PI);
+    double V_pear = 0.596981045;//(4*M_PI*RII*RII*RII);
+	rho_sum_o = 0.3*n_bins/V_pear;
 
-    alpha = 0.1;
+    alpha = 0.01;
 
     Setup(); 
     
     CalcRho();
 
     CalcW0();
-       
-    w0[0].print(n_bins,DeltaR); 
-    
-    CalcW1();
-    
-    w1[0][0].print(n_bins,DeltaR); 
-    
-    CalcW2();
-    
-    w2[0][0].print(n_bins,DeltaR); 
-    
-    CalcW3();
-    
-    w3[0].print(n_bins,DeltaR); 
 
+    for( j=0; j<= 10; j++) w0[10*j].print(n_bins,DeltaR); 
+
+    CalcW1();
+    CalcW2();
+    CalcW3();
+       
+    
+    for ( i = 0; i <= lmax; i++)
+        for(j=0; j<= 10; j++) w1[i][10*j].print(n_bins,DeltaR); 
+    
+    for ( i = 0; i <= lmax; i++)
+        for(j=0; j<= 10; j++) w2[i][10*j].print(n_bins,DeltaR); 
+   
+    for(j=0; j<= 10; j++) w3[10*j].print(n_bins,DeltaR); 
     st =0;
     
     now = 0;
     prev = 1; 
-    while( fabs(now-prev)>1e-8  ){
+    while( fabs(now-prev)> 1e-9 && st < 5000 ){
         for(j=0; j<= 100; j++) rho[j].fft();
 
         CalcN();
@@ -76,7 +77,7 @@ int main (){
         CalcC();
 		
         if(st==0){
-            rho[0].print(n_bins,DeltaR); 
+            //for( j=0; j<= 100; j++) rho[j].print(n_bins,DeltaR); 
             n0.print(n_bins,DeltaR); 
             n1[0].print(n_bins,DeltaR); 
             n2[0].print(n_bins,DeltaR); 
@@ -96,6 +97,7 @@ int main (){
         }
 
         CalcRhoN();
+
         st++;
     }    
     
@@ -106,14 +108,13 @@ int main (){
     }
    
     for( iz = 0; iz < n_bins; iz++){
-        rho[0].real[iz] = 0.5*(rho[0].real[iz]+rho[100].real[iz]);
+        rho_fin.real[iz] = 0.5*(rho[0].real[iz]+rho[100].real[iz]);
 
         for ( j = 1; j < 100; j++){
-            rho[0].real[iz] += rho[j].real[iz];
-            rho[0].real[iz] += rho[j].real[iz];
+           // theta = acos(j*0.02-1);
+            rho_fin.real[iz] += rho[j].real[iz];
         }
-        rho[0].real[iz] *= DeltaT;
+        rho_fin.real[iz] *= 0.02*V_pear;
     }
-    rho[0].Filename = "rho_fin.dat";
-    rho[0].printReal(n_bins, DeltaR);
+    rho_fin.print(n_bins, DeltaR);
 }
