@@ -1,5 +1,5 @@
 
-struct paras { double kr; int l; int m; };
+struct paras { double kr; double tt; double aa; complex double Exp; int l; int m; };
 
 class weight { 
 	public:

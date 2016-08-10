@@ -46,6 +46,102 @@ void CalcRho(){
 }
 
 
+void CalcW(){
+
+    for( j = 0; j <= 100; j++){
+        theta = j*0.02-1;
+        costheta = DeltaK*theta;
+        sintheta = DeltaK*sqrt(1-theta*theta);
+        for ( iz = 0; iz < n_bins; iz++){
+            if( iz < n_bins_2){
+                params.kr = sintheta*iz;
+                kz = costheta*iz;
+            }else{
+                params.kr = sintheta*(n_bins-iz);
+                kz = costheta*(iz-n_bins);
+            }
+            
+            params.tt = 0.5;
+            params.aa = a2;
+            
+            exponent = cexp(-I*kz*b1); 
+            
+            w0[j].fourier[iz] = 0.5*w0func(b1,params)*exponent;
+            w3[j].fourier[iz] = 0.5*w3func(b1,params)*exponent ;
+            
+            for ( i = 0; i <= lmax; i++){
+                params.l = i;
+                w1[i][j].fourier[iz] = 0;
+                w2[i][j].fourier[iz] = 0;
+                for( v = 0; v<=2*i; v++){
+                    params.m = v-i;
+                    Wig = Wignerd(-acos(theta), i ,0, params.m);
+
+                    w1[i][j].real[iz] = 0.5*w1func(b1,params)*exponent;
+                    w1[i][j].fourier[iz] += Wig*w1[i][j].real[iz];
+                    w2[i][j].real[iz] = 0.5*w1func(b1,params)*exponent;
+                    w2[i][j].fourier[iz] += Wig*w1[i][j].real[iz];
+                }
+            }
+            
+            exponent = cexp(I*kz*b1); 
+            params.aa = a3;
+
+            w0[j].fourier[iz] += 0.5*w0func(b1,params)*exponent;
+            w3[j].fourier[iz] += 0.5*w3func(b1,params)*exponent ;
+            
+            for ( i = 0; i <= lmax; i++){
+                params.l = i;
+                for( v = 0; v<=2*i; v++){
+                    params.m = v-i;
+                    Wig = Wignerd(-acos(theta), i ,0, params.m);
+
+                    w1[i][j].real[iz] = 0.5*w1func(b1,params)*exponent;
+                    w1[i][j].fourier[iz] += Wig*w1[i][j].real[iz];
+                    w2[i][j].real[iz] = 0.5*w1func(b1,params)*exponent;
+                    w2[i][j].fourier[iz] += Wig*w1[i][j].real[iz];
+                }
+            }
+
+            z= -b1+DeltaP;
+            while(z < b1){
+                exponent = cexp(-I*kz*z);
+                if( z < 0){
+                    z2 = -z;
+                    params.aa = a3;
+                }else{
+                    z2 = z;
+                    params.aa = a2;
+                }
+                 
+                params.tt = 0.5*(1-sqrt(1-z2*b1_inv));
+
+                w0[j].fourier[iz] += w0func(z2,params)*exponent;
+                w3[j].fourier[iz] += w3func(z2,params)*exponent;
+                for ( i = 0; i <= lmax; i++){
+                    params.l = i;
+                    for( v = 0; v<=2*i; v++){
+                        params.m = v-i;
+                        Wig = Wignerd(-acos(theta), i ,0, params.m);
+                        w1[i][j].real[iz] = w1func(z2,params)*exponent;
+                        w1[i][j].fourier[iz] += Wig*w1[i][j].real[iz];
+                        w2[i][j].real[iz] = w2func(z2,params)*exponent;
+                        w2[i][j].fourier[iz] += Wig*w2[i][j].real[iz];
+                    }
+                }
+                z += DeltaP;
+            }
+            w0[j].fourier[iz] *= DeltaP*inv_n;
+            w3[j].fourier[iz] *= DeltaP*inv_n;
+            for ( i = 0; i <= lmax; i++){
+                w1[i][j].fourier[iz] *= DeltaP*inv_n;
+                w2[i][j].fourier[iz] *= DeltaP*inv_n;
+            }
+        }
+        std::cout << "             W[" << j << "]" << std::endl;
+    }
+}
+
 void CalcW0(){
 
     for( j = 0; j <= 100; j++){
@@ -71,8 +167,6 @@ void CalcW0(){
         }
         std::cout << "             W0[" << j << "]" << std::endl;
     }
-    
-    for( j = 0; j <= 100; j++) w0[j].invfft();
 }
 
 void CalcW1(){
@@ -104,7 +198,7 @@ void CalcW1(){
                     }
                     w1[i][j].real[iz] *= DeltaP*inv_n;
 
-                    w1[i][j].fourier[iz] += Wignerd(-theta, i ,0, params.m)*w1[i][j].real[iz];
+                    w1[i][j].fourier[iz] += Wignerd(-acos(theta), i ,0, params.m)*w1[i][j].real[iz];
                 } 
             }
             std::cout << "             W1_" << i << "[" << j << "]" << std::endl;
@@ -142,7 +236,7 @@ void CalcW2(){
                     }
                     w2[i][j].real[iz] *= DeltaP*inv_n;
                     
-                    w2[i][j].fourier[iz] += Wignerd(-theta, i ,0, params.m)*w2[i][j].real[iz];
+                    w2[i][j].fourier[iz] += Wignerd(-acos(theta), i ,0, params.m)*w2[i][j].real[iz];
                 } 
             }
             std::cout << "             W2_" << i << "[" << j << "]" << std::endl;

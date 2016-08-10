@@ -37,7 +37,7 @@
 
 //Universal Variables
 	int n_bins, n_bins_2;
-    double z, zz, kz, theta, atheta;
+    double z, z2, kz, theta;// atheta;
 	double inv_n, H, H2, RII, RT;
     double DeltaR, DeltaK, DeltaT, DeltaP, inv_nDeltaR;
 	int i, j, iz, v, st;
@@ -47,9 +47,9 @@
 //Varaibles Calc.h    
     int numb;
     double real, imag, costheta, sintheta;
-    double complex coskz, sincosb1, cossinb1;
+    double complex coskz, sincosb1, cossinb1, exponent;
     double errorReal, errorImag, Wig;
-    struct paras params = {0, 0, 0};
+    struct paras params = {0, 0, 0, 0, 0, 0};
     
 //Varaiables PHI
 

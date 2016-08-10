@@ -63,9 +63,10 @@ double Wignerd(double theta, int l, int m, int n){
 double SHN(int l, int m){
    
     int l_m = factorial(l-m);
-    int lm = 1/factorial(l+m);
+    double lm = 1/factorial(l+m);
 
     double d = 0.25*InvPi*(2*l+1);
+    
     if(m >0) return sqrt(l_m*d*lm);
     else return pow(-1,m)*sqrt(lm*d*l_m);
 }

@@ -42,15 +42,16 @@ int main (){
     
     CalcRho();
 
+/*
     CalcW0();
-
-    for( j=0; j<= 10; j++) w0[10*j].print(n_bins,DeltaR); 
 
     CalcW1();
     CalcW2();
     CalcW3();
-       
-    
+   */ 
+    CalcW();
+
+    for( j=0; j<= 10; j++) w0[10*j].print(n_bins,DeltaR); 
     for ( i = 0; i <= lmax; i++)
         for(j=0; j<= 10; j++) w1[i][10*j].print(n_bins,DeltaR); 
     
@@ -58,11 +59,12 @@ int main (){
         for(j=0; j<= 10; j++) w2[i][10*j].print(n_bins,DeltaR); 
    
     for(j=0; j<= 10; j++) w3[10*j].print(n_bins,DeltaR); 
+
     st =0;
     
     now = 0;
     prev = 1; 
-    while( fabs(now-prev)> 1e-9 && st < 5000 ){
+    while( fabs(now-prev) > 1e-9 && st < 5000 ){
         for(j=0; j<= 100; j++) rho[j].fft();
 
         CalcN();
@@ -75,9 +77,9 @@ int main (){
     
         
         CalcC();
-		
+		/*
         if(st==0){
-            //for( j=0; j<= 100; j++) rho[j].print(n_bins,DeltaR); 
+            for( j=0; j<= 100; j++) rho[j].print(n_bins,DeltaR); 
             n0.print(n_bins,DeltaR); 
             n1[0].print(n_bins,DeltaR); 
             n2[0].print(n_bins,DeltaR); 
@@ -95,6 +97,7 @@ int main (){
             c1[0].print(n_bins,DeltaR); 
             c1[20].print(n_bins,DeltaR); 
         }
+        */
 
         CalcRhoN();
 
@@ -111,7 +114,6 @@ int main (){
         rho_fin.real[iz] = 0.5*(rho[0].real[iz]+rho[100].real[iz]);
 
         for ( j = 1; j < 100; j++){
-           // theta = acos(j*0.02-1);
             rho_fin.real[iz] += rho[j].real[iz];
         }
         rho_fin.real[iz] *= 0.02*V_pear;
