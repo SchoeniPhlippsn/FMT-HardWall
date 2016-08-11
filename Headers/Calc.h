@@ -50,8 +50,19 @@ void CalcW(){
 
     for( j = 0; j <= 100; j++){
         theta = j*0.02-1;
+        atheta = -acos(theta);
         costheta = DeltaK*theta;
         sintheta = DeltaK*sqrt(1-theta*theta);
+        
+        params.tt = 0.5;
+        
+        params.gauss = gaussC(0.5,a2);
+        params.mean = meanC(0.5,a2);
+        params.diff = diffC(0.5,a2);
+        params.RR = RR(0.5,a2);
+        params.AblRR = RRAbl2(b1,a2);
+        params.theta = getTheta(0.5,a2);
+        
         for ( iz = 0; iz < n_bins; iz++){
             if( iz < n_bins_2){
                 params.kr = sintheta*iz;
@@ -61,13 +72,11 @@ void CalcW(){
                 kz = costheta*(iz-n_bins);
             }
             
-            params.tt = 0.5;
-            params.aa = a2;
             
             exponent = cexp(-I*kz*b1); 
-            
-            w0[j].fourier[iz] = 0.5*w0func(b1,params)*exponent;
-            w3[j].fourier[iz] = 0.5*w3func(b1,params)*exponent ;
+
+            w0[j].fourier[iz] = 0.5*w0func(params)*exponent;
+            w3[j].fourier[iz] = 0.5*w3func(params)*exponent;
             
             for ( i = 0; i <= lmax; i++){
                 params.l = i;
@@ -75,62 +84,97 @@ void CalcW(){
                 w2[i][j].fourier[iz] = 0;
                 for( v = 0; v<=2*i; v++){
                     params.m = v-i;
-                    Wig = Wignerd(-acos(theta), i ,0, params.m);
+                    Wig = Wignerd(atheta, i ,0, params.m);
 
-                    w1[i][j].real[iz] = 0.5*w1func(b1,params)*exponent;
+                    w1[i][j].real[iz] = 0.5*w1func(params)*exponent;
                     w1[i][j].fourier[iz] += Wig*w1[i][j].real[iz];
-                    w2[i][j].real[iz] = 0.5*w1func(b1,params)*exponent;
+                    w2[i][j].real[iz] = 0.5*w1func(params)*exponent;
                     w2[i][j].fourier[iz] += Wig*w1[i][j].real[iz];
                 }
             }
+        }
+        
+        params.gauss = gaussC(0.5,a3);
+        params.mean = meanC(0.5,a3);
+        params.diff = diffC(0.5,a3);
+        params.RR = RR(0.5,a3);
+        params.AblRR = RRAbl2(b1,a3);
+        params.theta = getTheta(0.5,a3);
+        for ( iz = 0; iz < n_bins; iz++){
+            if( iz < n_bins_2){
+                params.kr = sintheta*iz;
+                kz = costheta*iz;
+            }else{
+                params.kr = sintheta*(n_bins-iz);
+                kz = costheta*(iz-n_bins);
+            }
             
             exponent = cexp(I*kz*b1); 
-            params.aa = a3;
-
-            w0[j].fourier[iz] += 0.5*w0func(b1,params)*exponent;
-            w3[j].fourier[iz] += 0.5*w3func(b1,params)*exponent ;
+            
+            w0[j].fourier[iz] += 0.5*w0func(params)*exponent;
+            w3[j].fourier[iz] += 0.5*w3func(params)*exponent ;
             
             for ( i = 0; i <= lmax; i++){
                 params.l = i;
                 for( v = 0; v<=2*i; v++){
                     params.m = v-i;
-                    Wig = Wignerd(-acos(theta), i ,0, params.m);
+                    Wig = Wignerd(atheta, i ,0, params.m);
 
-                    w1[i][j].real[iz] = 0.5*w1func(b1,params)*exponent;
+                    w1[i][j].real[iz] = 0.5*w1func(params)*exponent;
                     w1[i][j].fourier[iz] += Wig*w1[i][j].real[iz];
-                    w2[i][j].real[iz] = 0.5*w1func(b1,params)*exponent;
+                    w2[i][j].real[iz] = 0.5*w1func(params)*exponent;
                     w2[i][j].fourier[iz] += Wig*w1[i][j].real[iz];
                 }
             }
+        } 
+            
+        z= -b1+DeltaP;
 
-            z= -b1+DeltaP;
-            while(z < b1){
-                exponent = cexp(-I*kz*z);
-                if( z < 0){
-                    z2 = -z;
-                    params.aa = a3;
+        while(z < b1){
+            if( z < 0){
+                z2 = -z;
+                params.aa = a3;
+            }else{
+                z2 = z;
+                params.aa = a2;
+            }
+            params.tt = 0.5*(1-sqrt(1-z2*b1_inv));
+            params.gauss = gaussC(params.tt,params.aa);
+            params.mean = meanC(params.tt,params.aa);
+            params.diff = diffC(params.tt,params.aa);
+            params.RR = RR(params.tt,params.aa);
+            params.AblRR = RRAbl2(z2,params.aa);
+            params.theta = getTheta(params.tt,params.aa);
+            
+            for ( iz = 0; iz < n_bins; iz++){
+                if( iz < n_bins_2){
+                    params.kr = sintheta*iz;
+                    kz = costheta*iz;
                 }else{
-                    z2 = z;
-                    params.aa = a2;
+                    params.kr = sintheta*(n_bins-iz);
+                    kz = costheta*(iz-n_bins);
                 }
-                 
-                params.tt = 0.5*(1-sqrt(1-z2*b1_inv));
 
-                w0[j].fourier[iz] += w0func(z2,params)*exponent;
-                w3[j].fourier[iz] += w3func(z2,params)*exponent;
+               // double bessel[2] = { gsl_sf_bessel_J0(params.kr*params.RR), gsl_sf_bessel_J1(params.kr*params.RR)};
+                exponent = cexp(-I*kz*z);
+
+                w0[j].fourier[iz] += w0func(params)*exponent;
+                w3[j].fourier[iz] += w3func(params)*exponent;
                 for ( i = 0; i <= lmax; i++){
                     params.l = i;
                     for( v = 0; v<=2*i; v++){
                         params.m = v-i;
-                        Wig = Wignerd(-acos(theta), i ,0, params.m);
-                        w1[i][j].real[iz] = w1func(z2,params)*exponent;
+                        Wig = Wignerd(atheta, i ,0, params.m);
+                        w1[i][j].real[iz] = w1func(params)*exponent;
                         w1[i][j].fourier[iz] += Wig*w1[i][j].real[iz];
-                        w2[i][j].real[iz] = w2func(z2,params)*exponent;
+                        w2[i][j].real[iz] = w2func(params)*exponent;
                         w2[i][j].fourier[iz] += Wig*w2[i][j].real[iz];
                     }
                 }
-                z += DeltaP;
             }
+            z += DeltaP;
+        }
+        for ( iz = 0; iz < n_bins; iz++){
             w0[j].fourier[iz] *= DeltaP*inv_n;
             w3[j].fourier[iz] *= DeltaP*inv_n;
             for ( i = 0; i <= lmax; i++){
@@ -141,138 +185,6 @@ void CalcW(){
         std::cout << "             W[" << j << "]" << std::endl;
     }
 }
-
-void CalcW0(){
-
-    for( j = 0; j <= 100; j++){
-        theta = j*0.02-1;
-        costheta = DeltaK*theta;
-        sintheta = DeltaK*sqrt(1-theta*theta);
-        for ( iz = 0; iz < n_bins; iz++){
-            if( iz < n_bins_2){
-                params.kr = sintheta*iz;
-                kz = costheta*iz;
-            }else{
-                params.kr = sintheta*(n_bins-iz);
-                kz = costheta*(iz-n_bins);
-            }
-            
-            w0[j].fourier[iz] = 0.5*(w0func(b1,params)*cexp(-I*kz*b1)+w0func(-b1,params)*cexp(I*kz*b1));
-            z= -b1+DeltaP;
-            while(z < b1){ 
-                w0[j].fourier[iz] += w0func(z,params)*cexp(-I*kz*z);
-                z += DeltaP;
-            }
-            w0[j].fourier[iz] *= DeltaP*inv_n;
-        }
-        std::cout << "             W0[" << j << "]" << std::endl;
-    }
-}
-
-void CalcW1(){
-            
-    for ( j = 0; j <= 100; j++){
-        theta = j*0.02-1;
-        costheta = DeltaK*theta;
-        sintheta = DeltaK*sqrt(1-theta*theta);
-        for ( i = 0; i <= lmax; i++){
-            params.l = i;
-            for ( iz = 0; iz < n_bins; iz++){
-                if( iz < n_bins_2){
-                    params.kr = sintheta*iz;
-                    kz = costheta*iz;
-                }else{
-                    params.kr = sintheta*(n_bins-iz);
-                    kz = costheta*(iz-n_bins);
-                }
-
-                w1[i][j].fourier[iz] = 0;
-                for( v = 0; v<=2*i; v++){
-                    params.m = v-i;
-
-                    w1[i][j].real[iz] = 0.5*(w1func(b1,params)*cexp(-I*kz*b1)+w1func(-b1,params)*cexp(I*kz*b1));
-                    z= -b1+DeltaP;
-                    while(z < b1){ 
-                        w1[i][j].real[iz] += w1func(z,params)*cexp(-I*kz*z);
-                        z += DeltaP;
-                    }
-                    w1[i][j].real[iz] *= DeltaP*inv_n;
-
-                    w1[i][j].fourier[iz] += Wignerd(-acos(theta), i ,0, params.m)*w1[i][j].real[iz];
-                } 
-            }
-            std::cout << "             W1_" << i << "[" << j << "]" << std::endl;
-        }
-    }
-}    
-
-
-void CalcW2(){
-    
-    for ( j = 0; j <= 100; j++){
-        theta = j*0.02-1;
-        costheta = DeltaK*theta;
-        sintheta = DeltaK*sqrt(1-theta*theta);
-        for ( i = 0; i <= lmax; i++){
-            params.l = i;
-            for ( iz = 0; iz < n_bins; iz++){
-                if( iz < n_bins_2){
-                    params.kr = sintheta*iz;
-                    kz = costheta*iz;
-                }else{
-                    params.kr = sintheta*(n_bins-iz);
-                    kz = costheta*(iz-n_bins);
-                }
-
-                w2[i][j].fourier[iz] = 0;
-                for( v = 0; v<=2*i; v++){
-                    params.m = v-i;
-
-                    w2[i][j].real[iz] = 0.5*(w2func(b1,params)*cexp(-I*kz*b1)+w2func(-b1,params)*cexp(I*kz*b1));
-                    z= -b1+DeltaP;
-                    while(z < b1){ 
-                        w2[i][j].real[iz] += w2func(z,params)*cexp(-I*kz*z);
-                        z += DeltaP;
-                    }
-                    w2[i][j].real[iz] *= DeltaP*inv_n;
-                    
-                    w2[i][j].fourier[iz] += Wignerd(-acos(theta), i ,0, params.m)*w2[i][j].real[iz];
-                } 
-            }
-            std::cout << "             W2_" << i << "[" << j << "]" << std::endl;
-        }
-    }
-}
-
-void CalcW3(){
-
-    for( j = 0; j <= 100; j++){
-        //theta = DeltaT*j;
-        theta = j*0.02-1;
-        costheta = DeltaK*theta;
-        sintheta = DeltaK*sqrt(1-theta*theta);
-        for ( iz = 0; iz < n_bins; iz++){
-            if( iz < n_bins_2){
-                params.kr = sintheta*iz;
-                kz = costheta*iz;
-            }else{
-                params.kr = sintheta*(n_bins-iz);
-                kz = costheta*(iz-n_bins);
-            }
-            
-            w3[j].fourier[iz] = 0.5*(w3func(b1,params)*cexp(-I*kz*b1)+w3func(-b1,params)*cexp(I*kz*b1)) ;
-            z= -b1+DeltaP;
-            while(z < b1){ 
-                w3[j].fourier[iz] += w3func(z,params)*cexp(-I*kz*z);
-                z += DeltaP;
-            }
-            w3[j].fourier[iz] *= DeltaP*inv_n;
-        }
-        std::cout << "             W3[" << j << "]" << std::endl;
-    }
-}
-
-
 
 void CalcN(){
 

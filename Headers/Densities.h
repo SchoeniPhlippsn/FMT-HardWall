@@ -1,140 +1,35 @@
-/*
-double w0func (double zz, struct paras p) {
-    double kr = p.kr;
-    double aa = a2;
+double w0func (struct paras p) {
 
-    if(zz < 0){
-        zz *= -1;
-        aa=a3;
-    }
-     
-    double tt = 0.5*(1-sqrt(1-zz*b1_inv));
-    double f  = 0.5*gaussC(tt,aa)*RRAbl2(zz,aa)*gsl_sf_bessel_J0(kr*RR(tt,aa));
-    return f;
-}*/
-
-double w0func (double zz, struct paras p) {
-    double kr = p.kr;
-    double aa = p.aa;
-    double tt = p.tt;
-
-    double f  = 0.5*gaussC(tt,aa)*RRAbl2(zz,aa)*gsl_sf_bessel_J0(kr*RR(tt,aa));
+    double f  = 0.5*p.gauss*p.AblRR*gsl_sf_bessel_J0(p.kr*p.RR);
     return f;
 }
 
-/*
-double w1func (double zz, struct paras p) {
-    double kr = p.kr;
-    int l = p.l;
-    int m = p.m;
-    double aa = a2;
 
-    if(zz < 0){
-        zz *= -1;
-        aa=a3;
-    }
-     
-    double tt = 0.5*(1-sqrt(1-zz*b1_inv));
-    
-    double theta = getTheta(tt,aa);
+double w1func (struct paras p) {
     double f;
-    if(l==0) f = 0.5*RRAbl2(zz,aa)*Wignerd(theta,l,m,0)*gsl_sf_bessel_J0(kr*RR(tt,aa))*meanC(tt,aa);
-    if(l==1) f = -0.5*RRAbl2(zz,aa)*Wignerd(theta,l,m,0)*gsl_sf_bessel_Jn(m,kr*RR(tt,aa))*meanC(tt,aa);
-    if(l>1){
-        double Wig1 = Wignerd(theta,l,m,2)+Wignerd(theta,l,m,-2);
-        f = 2*M_PI*RRAbl2(zz,aa)*Wig1*gsl_sf_bessel_Jn(m,kr*RR(tt,aa))*diffC(tt,aa)*SHN(l,2)*SHN(l,0);
-        if( l % 2 == 1) f *= -1;
+    if(p.l==0) f = 0.5*p.AblRR*Wignerd(p.theta,p.l,p.m,0)*gsl_sf_bessel_J0(p.kr*p.RR)*p.mean;
+    if(p.l==1) f = -0.5*p.AblRR*Wignerd(p.theta,p.l,p.m,0)*gsl_sf_bessel_Jn(p.m,p.kr*p.RR)*p.mean;
+    if(p.l>1){
+        double Wig1 = Wignerd(p.theta,p.l,p.m,2)+Wignerd(p.theta,p.l,p.m,-2);
+        f = 2*M_PI*p.AblRR*Wig1*p.diff*SHN(p.l,2)*SHN(p.l,0)*gsl_sf_bessel_Jn(p.m,p.kr*p.RR);
+        if( p.l % 2 == 1) f *= -1;
     }
     return f;
 }
-*/
 
-double w1func (double zz, struct paras p) {
-    double kr = p.kr;
-    double tt = p.tt;
-    double aa = p.aa;
-    int l = p.l;
-    int m = p.m;
+double w2func (struct paras p) {
     
-    double theta = getTheta(tt,aa);
+    double f = 2*M_PI*p.AblRR*Wignerd(p.theta,p.l,p.m,0)*gsl_sf_bessel_Jn(p.m,p.kr*p.RR);
+    return f;
+}
+
+double w3func (struct paras p) {
     double f;
-    if(l==0) f = 0.5*RRAbl2(zz,aa)*Wignerd(theta,l,m,0)*gsl_sf_bessel_J0(kr*RR(tt,aa))*meanC(tt,aa);
-    if(l==1) f = -0.5*RRAbl2(zz,aa)*Wignerd(theta,l,m,0)*gsl_sf_bessel_Jn(m,kr*RR(tt,aa))*meanC(tt,aa);
-    if(l>1){
-        double Wig1 = Wignerd(theta,l,m,2)+Wignerd(theta,l,m,-2);
-        f = 2*M_PI*RRAbl2(zz,aa)*Wig1*gsl_sf_bessel_Jn(m,kr*RR(tt,aa))*diffC(tt,aa)*SHN(l,2)*SHN(l,0);
-        if( l % 2 == 1) f *= -1;
-    }
-    return f;
-}
-
-/*
-double w2func (double zz, struct paras p) {
-    double kr = p.kr;
-    int l = p.l;
-    int m = p.m;
-    double aa = a2;
-
-    if(zz < 0){
-        zz *= -1;
-        aa=a3;
-    }
-     
-    double tt = 0.5*(1-sqrt(1-zz*b1_inv));
-    
-    double theta = getTheta(tt,aa);
-    double f = 2*M_PI*RRAbl2(zz,aa)*Wignerd(theta,l,m,0)*gsl_sf_bessel_Jn(m,kr*RR(tt,aa));
-    return f;
-}
-*/
-
-
-double w2func (double zz, struct paras p) {
-    double kr = p.kr;
-    double tt = p.tt;
-    double aa = p.aa;
-    int l = p.l;
-    int m = p.m;
-    
-    double theta = getTheta(tt,aa);
-    double f = 2*M_PI*RRAbl2(zz,aa)*Wignerd(theta,l,m,0)*gsl_sf_bessel_Jn(m,kr*RR(tt,aa));
-    return f;
-}
-
-
-/*
-double w3func (double zz, struct paras p) {
-    double kr = p.kr;
-    double aa = a2;
-
-    if(zz < 0){
-        zz *= -1;
-        aa=a3;
-    }
-    
-    double tt = 0.5*(1-sqrt(1-zz*b1_inv));
-    double f;
-    if(kr>1e-7){
-        f=2*M_PI*RR(tt,aa)*gsl_sf_bessel_J1(kr*RR(tt,aa));
-        return f/(b1*kr);
+    if(p.kr>1e-7){
+        f=2*M_PI*p.RR*gsl_sf_bessel_J1(p.kr*p.RR);
+        return f/(b1*p.kr);
     }else{
-        f=M_PI*RR(tt,aa)*RR(tt,aa);
-        return f;
-    }
-}
-*/
-
-double w3func (double zz, struct paras p) {
-    double kr = p.kr;
-    double aa = p.aa;
-    double tt = p.tt;
-
-    double f;
-    if(kr>1e-7){
-        f=2*M_PI*RR(tt,aa)*gsl_sf_bessel_J1(kr*RR(tt,aa));
-        return f/(b1*kr);
-    }else{
-        f=M_PI*RR(tt,aa)*RR(tt,aa);
+        f=M_PI*p.RR*p.RR;
         return f;
     }
 }

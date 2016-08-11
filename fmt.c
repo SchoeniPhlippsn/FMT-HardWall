@@ -3,9 +3,10 @@
 #include <cstdlib>
 #include <cmath>
 #include <malloc.h>
+//#include <boost/math/special_functions/bessel.hpp>
 #include <complex.h>
-#include <gsl/gsl_integration.h>
-#include <gsl/gsl_errno.h>
+//#include <gsl/gsl_integration.h>
+//#include <gsl/gsl_errno.h>
 #include <gsl/gsl_sf_bessel.h>
 #include <gsl/gsl_sf_gamma.h>
 #include <gsl/gsl_sf_coupling.h>
@@ -16,8 +17,18 @@
 
 
 int main (){
-
-	n_bins = 512;
+    
+    z = 0.5; 
+    std::cout << "0 " << gsl_sf_bessel_J0(z) << std::endl;
+    std::cout << "1 " << gsl_sf_bessel_J1(z) << std::endl;
+    std::cout << "-1 " << gsl_sf_bessel_Jn(-1,z) << std::endl;
+    for( i = 2; i <= 8; i++){
+        std::cout << i << " " << gsl_sf_bessel_Jn(i,z) << std::endl;
+        std::cout << -i << " " << gsl_sf_bessel_Jn(-i,z) << std::endl;
+    }
+    exit(0);
+	
+    n_bins = 512;
 	n_bins_2 = n_bins/2;
 	inv_n = 1./n_bins;
 

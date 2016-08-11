@@ -1,6 +1,6 @@
 //Constants
 
-    const int lmax = 8;
+    const int lmax = 4;
     const double kth = 3.8;
     const double asp = 3;
     const double a1 = sqrt(0.5)*0.5;
@@ -37,7 +37,7 @@
 
 //Universal Variables
 	int n_bins, n_bins_2;
-    double z, z2, kz, theta;// atheta;
+    double z, z2, kz, theta, atheta;
 	double inv_n, H, H2, RII, RT;
     double DeltaR, DeltaK, DeltaT, DeltaP, inv_nDeltaR;
 	int i, j, iz, v, st;
@@ -47,10 +47,11 @@
 //Varaibles Calc.h    
     int numb;
     double real, imag, costheta, sintheta;
-    double complex coskz, sincosb1, cossinb1, exponent;
+    complex double coskz, sincosb1, cossinb1, exponent;
     double errorReal, errorImag, Wig;
-    struct paras params = {0, 0, 0, 0, 0, 0};
-    
+    struct paras params = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+    double bessel[2*lmax+1];
+      
 //Varaiables PHI
 
     int factor;
