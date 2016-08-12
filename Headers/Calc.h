@@ -73,10 +73,20 @@ void CalcW(){
             }
             
             
-            exponent = cexp(-I*kz*b1); 
+            exponent = cexp(-I*kz*b1);
+            
+            bessel[lmax] = gsl_sf_bessel_J0(params.kr*params.RR);  
+            bessel[lmax+1] = gsl_sf_bessel_J1(params.kr*params.RR);  
+            bessel[lmax-1] = -bessel[lmax+1];  
 
-            w0[j].fourier[iz] = 0.5*w0func(params)*exponent;
-            w3[j].fourier[iz] = 0.5*w3func(params)*exponent;
+            for( i=2; i <= lmax; i++){
+                bessel[lmax+i] = gsl_sf_bessel_Jn(i,params.kr*params.RR);
+                if( i % 2 == 0) bessel[lmax-i] = bessel[lmax+i];
+                else bessel[lmax-i] = -bessel[lmax+i];
+            }
+
+            w0[j].fourier[iz] = 0.5*w0func(bessel,params)*exponent;
+            w3[j].fourier[iz] = 0.5*w3func(bessel,params)*exponent;
             
             for ( i = 0; i <= lmax; i++){
                 params.l = i;
@@ -86,9 +96,9 @@ void CalcW(){
                     params.m = v-i;
                     Wig = Wignerd(atheta, i ,0, params.m);
 
-                    w1[i][j].real[iz] = 0.5*w1func(params)*exponent;
+                    w1[i][j].real[iz] = 0.5*w1func(bessel,params)*exponent;
                     w1[i][j].fourier[iz] += Wig*w1[i][j].real[iz];
-                    w2[i][j].real[iz] = 0.5*w1func(params)*exponent;
+                    w2[i][j].real[iz] = 0.5*w1func(bessel,params)*exponent;
                     w2[i][j].fourier[iz] += Wig*w1[i][j].real[iz];
                 }
             }
@@ -111,8 +121,17 @@ void CalcW(){
             
             exponent = cexp(I*kz*b1); 
             
-            w0[j].fourier[iz] += 0.5*w0func(params)*exponent;
-            w3[j].fourier[iz] += 0.5*w3func(params)*exponent ;
+            bessel[lmax] = gsl_sf_bessel_J0(params.kr*params.RR);  
+            bessel[lmax+1] = gsl_sf_bessel_J1(params.kr*params.RR);  
+            bessel[lmax-1] = -bessel[lmax+1];  
+
+            for( i=2; i <= lmax; i++){
+                bessel[lmax+i] = gsl_sf_bessel_Jn(i,params.kr*params.RR);
+                if( i % 2 == 0) bessel[lmax-i] = bessel[lmax+i];
+                else bessel[lmax-i] = -bessel[lmax+i];
+            }
+            w0[j].fourier[iz] += 0.5*w0func(bessel,params)*exponent;
+            w3[j].fourier[iz] += 0.5*w3func(bessel,params)*exponent ;
             
             for ( i = 0; i <= lmax; i++){
                 params.l = i;
@@ -120,9 +139,9 @@ void CalcW(){
                     params.m = v-i;
                     Wig = Wignerd(atheta, i ,0, params.m);
 
-                    w1[i][j].real[iz] = 0.5*w1func(params)*exponent;
+                    w1[i][j].real[iz] = 0.5*w1func(bessel,params)*exponent;
                     w1[i][j].fourier[iz] += Wig*w1[i][j].real[iz];
-                    w2[i][j].real[iz] = 0.5*w1func(params)*exponent;
+                    w2[i][j].real[iz] = 0.5*w1func(bessel,params)*exponent;
                     w2[i][j].fourier[iz] += Wig*w1[i][j].real[iz];
                 }
             }
@@ -157,17 +176,27 @@ void CalcW(){
 
                // double bessel[2] = { gsl_sf_bessel_J0(params.kr*params.RR), gsl_sf_bessel_J1(params.kr*params.RR)};
                 exponent = cexp(-I*kz*z);
+            
+                bessel[lmax] = gsl_sf_bessel_J0(params.kr*params.RR);  
+                bessel[lmax+1] = gsl_sf_bessel_J1(params.kr*params.RR);  
+                bessel[lmax-1] = -bessel[lmax+1];  
 
-                w0[j].fourier[iz] += w0func(params)*exponent;
-                w3[j].fourier[iz] += w3func(params)*exponent;
+                for( i=2; i <= lmax; i++){
+                    bessel[lmax+i] = gsl_sf_bessel_Jn(i,params.kr*params.RR);
+                    if( i % 2 == 0) bessel[lmax-i] = bessel[lmax+i];
+                    else bessel[lmax-i] = -bessel[lmax+i];
+                }
+
+                w0[j].fourier[iz] += w0func(bessel,params)*exponent;
+                w3[j].fourier[iz] += w3func(bessel,params)*exponent;
                 for ( i = 0; i <= lmax; i++){
                     params.l = i;
                     for( v = 0; v<=2*i; v++){
                         params.m = v-i;
                         Wig = Wignerd(atheta, i ,0, params.m);
-                        w1[i][j].real[iz] = w1func(params)*exponent;
+                        w1[i][j].real[iz] = w1func(bessel,params)*exponent;
                         w1[i][j].fourier[iz] += Wig*w1[i][j].real[iz];
-                        w2[i][j].real[iz] = w2func(params)*exponent;
+                        w2[i][j].real[iz] = w2func(bessel,params)*exponent;
                         w2[i][j].fourier[iz] += Wig*w2[i][j].real[iz];
                     }
                 }

@@ -17,7 +17,7 @@
 
 
 int main (){
-    
+  /*  
     z = 0.5; 
     std::cout << "0 " << gsl_sf_bessel_J0(z) << std::endl;
     std::cout << "1 " << gsl_sf_bessel_J1(z) << std::endl;
@@ -26,8 +26,7 @@ int main (){
         std::cout << i << " " << gsl_sf_bessel_Jn(i,z) << std::endl;
         std::cout << -i << " " << gsl_sf_bessel_Jn(-i,z) << std::endl;
     }
-    exit(0);
-	
+*/	
     n_bins = 512;
 	n_bins_2 = n_bins/2;
 	inv_n = 1./n_bins;
