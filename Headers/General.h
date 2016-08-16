@@ -1,6 +1,6 @@
 //Constants
 
-    const int lmax = 4;
+    const int lmax = 8;
     const double kth = 3.8;
     const double asp = 3;
     const double a1 = sqrt(0.5)*0.5;
@@ -50,6 +50,7 @@
     complex double coskz, sincosb1, cossinb1, exponent;
     double errorReal, errorImag, Wig;
     struct paras params = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+    struct paras PARAMS = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
     double bessel[2*lmax+1];
       
 //Varaiables PHI
