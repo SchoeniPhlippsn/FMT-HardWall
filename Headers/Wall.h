@@ -17,18 +17,18 @@ double WallDistance(double theta){
             x = a1*(1-t2)*(1-t2)*(1-t2) + 3*a3*(1-t2)*(1-t2)*t2 - 3*a3*(1-t2)*t2*t2 - a1*t2*t2*t2;
             y = -4*b1*t2*(1-t2);
 
-            return si*x + co*y;
         }else{
             double T11 = (18*a2-6*a1)*si;
             double T12 = (6*a1-18*a2)*si - 8*b1*co;
             double T13 = 4*b1*co + 3*(a2 - a1)*si;
 
-            double t1 = (-T12-sqrt(T12*T12-4*T11*T13))/(2*T11);
+            double t1; 
+            if( T11 > 1e-6) t1 = (-T12-sqrt(T12*T12-4*T11*T13))/(2*T11);
+            else t1 = -T13/T12;
             
             x = a1*(1-t1)*(1-t1)*(1-t1) + 3*a2*(1-t1)*(1-t1)*t1 - 3*a2*(1-t1)*t1*t1 - a1*t1*t1*t1;
             y = 4*b1*t1*(1-t1);
-
-            return si*x + co*y;
         }
+        return si*x + co*y;
     }
 }

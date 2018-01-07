@@ -42,7 +42,6 @@ double Wignerd(double theta, int l, int m, int n){
         } 
         
         if(abs(m+n) % 4 == 2) d *= -1;
-    
     }else{
 
         for(k=1; k <= l; k++){
@@ -71,12 +70,17 @@ double SHN(int l, int m){
     else return pow(-1,m)*sqrt(lm*d*l_m);
 }
 
-double RR (double t, double aa) {   
+double RR (double t, double aa) {   //Pear
     double rr = a1*(1-t)*(1-t)*(1-t) + 3*aa*(1-t)*(1-t)*t - 3*aa*(1-t)*t*t - a1*t*t*t;
     return rr;
 }
 
-double RRAbl2 (double z, double aa) {   
+/*double RR (double z, double aa) {   //Pear
+    double rr = sqrt(RII*RII - z*z);
+    return rr;
+}*/
+
+double RRAbl2 (double z, double aa) {   //Pear
     double term1 = (a1*b1-0.25*a1*z+0.75*aa*z)*b1_inv*b1_inv*b1_inv;
     double term2 = b1*b1*b1*b1 - b1*b1*b1*z;
     double term3 = -0.75*a1*b1+0.75*aa*b1+0.375*a1*z-1.125*aa*z;
@@ -84,9 +88,20 @@ double RRAbl2 (double z, double aa) {
     return term1*sqrt(term2);
 }
 
-double getTheta( double t, double aa) {
-    double nz = 3.0*(a1-aa)*(1-t)*(1-t) + 12.0*aa*t*(1-t) + 3.0*(a1-aa)*t*t;
-    if ( a1 < aa ) nz *= -1; 
+/*double RRAbl2 (double z, double aa) {   
+    double abl = z/RR(z,aa);
+    return RR(z,aa)*sqrt(1+abl*abl);
+}*/
+
+
+double getTheta( double t, double aa) {//Pear
+    double nz;
+    if( t<0){ 
+        t=-t;
+        nz = -3.0*(a1-aa)*(1-t)*(1-t) - 12.0*aa*t*(1-t) - 3.0*(a1-aa)*t*t;
+    }else{
+        nz = 3.0*(a1-aa)*(1-t)*(1-t) + 12.0*aa*t*(1-t) + 3.0*(a1-aa)*t*t;
+    }
    
     double nrho = 4*b1*(1-2*t);
 
@@ -95,3 +110,9 @@ double getTheta( double t, double aa) {
 
     return acos(nz);
 }
+
+/*double getTheta( double z, double aa) {
+    double nz = z/RII; 
+    
+    return acos(nz);
+}*/

@@ -10,6 +10,7 @@ class weight {
 		void setup (int,std::string);
 		void kill_plan ();
 		void print (int, double);
+		void read (int, std::string);
 		void printReal (int, double);
 		void fft (){fftw_execute(r2f);};
 		void invfft (){fftw_execute(f2r);};
@@ -55,9 +56,28 @@ void weight::print (int n_bins, double Delta){
 	
     for( int iz =0; iz < n_bins; iz++){
         double z = (iz+0.5)*Delta;
-        fprintf (reFile, "%.18f %.18f %.18f\n", z, creal(real[iz]), cimag(real[iz]));
-        fprintf (ftFile, "%.18f %.18f %.18f\n", z, creal(fourier[iz]), cimag(fourier[iz]));
+        fprintf (reFile, "%.18f %.18f %.18f %d\n", z, creal(real[iz]), cimag(real[iz]),iz);
+        fprintf (ftFile, "%.18f %.18f %.18f %d\n", z, creal(fourier[iz]), cimag(fourier[iz]),iz);
     }
+}
+
+void weight::read (int n_bins, std::string Name){
+	char file[30];
+    Name = "Results/" + Name;
+	strcpy(file,Name.c_str());
+	std::ifstream oFile(file);
+    
+    for( int iz =0; iz < n_bins; iz++){
+        double z, freal,fimag;
+        int zz;
+        oFile >> z >> freal >> fimag >> zz;
+        if(zz!=iz){ 
+            std::cout << "Problems with Input " << Name << std::endl;
+            exit(0);
+        }
+        fourier[iz] = freal+I*fimag;
+    }
+    oFile.close();
 }
 
 void weight::printReal (int n_bins, double Delta){

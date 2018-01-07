@@ -1,12 +1,12 @@
 //Constants
 
-    const int lmax = 8;
-    const double kth = 3.8;
-    const double asp = 3;
-    const double a1 = sqrt(0.5)*0.5;
-    const double a2 = a1*(kth-asp)/kth;
-    const double a3 = a1*(kth+asp)/kth;
-    const double b1 = 1.5*sqrt(0.5);
+    const int lmax =8;
+    const double kth=3.8;
+    const double asp=3;
+    const double a1=0.5;
+    const double a2=a1*(kth-2.0/3.0*asp)/kth;
+    const double a3=a1*(kth+2.0/3.0*asp)/kth;
+    const double b1 = asp*a1;
     const double b1_inv = 1/b1;
     const double InvPi=1/M_PI;
 
@@ -35,6 +35,9 @@
 	class weight sc3[101];
 	class weight c1[101];
 
+	class weight P1;
+	class weight P2;
+
 //Universal Variables
 	int n_bins, n_bins_2;
     double z, z2, kz, theta, atheta;
@@ -43,6 +46,7 @@
 	int i, j, iz, v, st;
     int l,m, l1, l2, l3, m1, m2, m3;
     double prev, now, tt, aa;
+    double V_pear;
      
 //Varaibles Calc.h    
     int numb;

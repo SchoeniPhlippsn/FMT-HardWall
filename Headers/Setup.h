@@ -14,6 +14,8 @@ void Setup(){
     PHI0.setup(n_bins,"PHI0.dat");
     PHI3.setup(n_bins,"PHI3.dat");
     rho_fin.setup(n_bins,"rho_fin.dat");
+    P1.setup(n_bins,"polar_order.dat");
+    P2.setup(n_bins,"nematic_order.dat");
     
     for( i = 0; i <= lmax ; i++){
         std::string is = toString(i); 
